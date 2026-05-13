@@ -1,0 +1,94 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum CardStatus {
+  pending
+  generating
+  completed
+  failed
+}
+
+enum TransactionType {
+  credit
+  debit
+}
+
+enum OrderStatus {
+  pending
+  completed
+  failed
+  refunded
+}
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String
+  displayName  String
+  points       Int      @default(20)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  cards        Card[]
+  transactions PointTransaction[]
+  orders       Order[]
+}
+
+model Card {
+  id                String     @id @default(uuid())
+  userId            String
+  originalImageUrl  String
+  generatedImageUrl String?
+  festival          String
+  styleId           String
+  styleType         String
+  decorations       String[]
+  greetingText      String
+  extraInstructions String?
+  status            CardStatus @default(pending)
+  taskId            String?
+  createdAt         DateTime   @default(now())
+  completedAt       DateTime?
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([taskId])
+}
+
+model PointTransaction {
+  id          String          @id @default(uuid())
+  userId      String
+  type        TransactionType
+  amount      Int
+  description String
+  referenceId String?
+  createdAt   DateTime        @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+}
+
+model Order {
+  id                  String      @id @default(uuid())
+  userId              String
+  amountHKD           Decimal     @db.Decimal(10, 2)
+  points              Int
+  stripeSessionId     String      @unique
+  stripePaymentIntent String?
+  status              OrderStatus @default(pending)
+  createdAt           DateTime    @default(now())
+  completedAt         DateTime?
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([stripeSessionId])
+}
