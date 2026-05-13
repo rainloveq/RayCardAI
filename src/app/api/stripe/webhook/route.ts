@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import { stripe } from '@/lib/stripe';
+import { getStripe } from '@/lib/stripe';
 
 export async function POST(req: Request) {
   try {
@@ -9,6 +9,7 @@ export async function POST(req: Request) {
 
     let event;
     try {
+      const stripe = getStripe();
       event = stripe.webhooks.constructEvent(
         body,
         signature,
@@ -25,8 +26,8 @@ export async function POST(req: Request) {
       if (userId && points) {
         const pointsNum = parseInt(points);
 
-        // Update order
-        const existingOrder = await prisma.order.findUnique({
+        // Check if already processed
+        const existingOrder = await prisma.order.findFirst({
           where: { stripeSessionId: checkoutSession.id },
         });
 
@@ -40,7 +41,6 @@ export async function POST(req: Request) {
               stripeSessionId: checkoutSession.id,
               stripePaymentIntent: checkoutSession.payment_intent,
               status: 'completed',
-              completedAt: new Date(),
             },
           });
 
