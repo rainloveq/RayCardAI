@@ -32,47 +32,52 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: '無效的點數' }, { status: 400 });
     }
 
-    // Idempotency check — already processed?
-    const existingOrder = await prisma.order.findUnique({
-      where: { stripeSessionId: sessionId },
+    // Use a transaction for idempotency + atomic writes
+    const result = await prisma.$transaction(async (tx) => {
+      // Idempotency check — already processed?
+      const existingOrder = await tx.order.findUnique({
+        where: { stripeSessionId: sessionId },
+      });
+
+      if (existingOrder) {
+        const u = await tx.user.findUnique({ where: { id: userId } });
+        return { points: u?.points || 0, alreadyProcessed: true };
+      }
+
+      // Create order
+      await tx.order.create({
+        data: {
+          userId,
+          amountHKD: checkoutSession.amount_total ? checkoutSession.amount_total / 100 : 0,
+          points,
+          stripeSessionId: sessionId,
+          stripePaymentIntent: (checkoutSession.payment_intent as string) || null,
+          status: 'completed',
+          completedAt: new Date(),
+        },
+      });
+
+      // Add points
+      await tx.user.update({
+        where: { id: userId },
+        data: { points: { increment: points } },
+      });
+
+      // Record transaction
+      await tx.pointTransaction.create({
+        data: {
+          userId,
+          type: 'credit',
+          amount: points,
+          description: `購買 ${checkoutSession.metadata?.planId || ''} ${points} 點數`,
+        },
+      });
+
+      const updatedUser = await tx.user.findUnique({ where: { id: userId } });
+      return { points: updatedUser?.points || 0, alreadyProcessed: false };
     });
 
-    if (existingOrder) {
-      // Already credited, return current points
-      const user = await prisma.user.findUnique({ where: { id: userId } });
-      return NextResponse.json({ points: user?.points || 0, alreadyProcessed: true });
-    }
-
-    // Create order and add points
-    await prisma.order.create({
-      data: {
-        userId,
-        amountHKD: checkoutSession.amount_total ? checkoutSession.amount_total / 100 : 0,
-        points,
-        stripeSessionId: sessionId,
-        stripePaymentIntent: checkoutSession.payment_intent as string || null,
-        status: 'completed',
-        completedAt: new Date(),
-      },
-    });
-
-    await prisma.user.update({
-      where: { id: userId },
-      data: { points: { increment: points } },
-    });
-
-    await prisma.pointTransaction.create({
-      data: {
-        userId,
-        type: 'credit',
-        amount: points,
-        description: `購買 ${checkoutSession.metadata?.planId || ''} ${points} 點數`,
-      },
-    });
-
-    const updatedUser = await prisma.user.findUnique({ where: { id: userId } });
-
-    return NextResponse.json({ points: updatedUser?.points || 0, alreadyProcessed: false });
+    return NextResponse.json(result);
   } catch (err: any) {
     if (err.message === 'Unauthorized') {
       return NextResponse.json({ error: '請先登入' }, { status: 401 });

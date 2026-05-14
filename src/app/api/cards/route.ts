@@ -45,41 +45,56 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: '請填寫所有必填欄位' }, { status: 400 });
     }
 
-    // Check points
-    const user = await prisma.user.findUnique({ where: { id: userId } });
-    if (!user || user.points < POINTS_PER_CARD) {
-      return NextResponse.json({ error: '點數不足，請先購買點數' }, { status: 403 });
+    // Atomic: create card + deduct points + record transaction
+    let card;
+    try {
+      card = await prisma.$transaction(async (tx) => {
+        // Optimistic concurrency: only deduct if user has enough points
+        const user = await tx.user.update({
+          where: {
+            id: userId,
+            points: { gte: POINTS_PER_CARD },
+          },
+          data: { points: { decrement: POINTS_PER_CARD } },
+        });
+
+        if (!user) throw new Error('點數不足');
+
+        // Create card record
+        const newCard = await tx.card.create({
+          data: {
+            userId,
+            originalImageUrl,
+            festival,
+            styleId,
+            styleType,
+            decorations: decorations || [],
+            greetingText,
+            extraInstructions,
+            status: 'generating',
+          },
+        });
+
+        // Record point transaction
+        await tx.pointTransaction.create({
+          data: {
+            userId,
+            type: 'debit',
+            amount: POINTS_PER_CARD,
+            description: `製作賀卡（${festival}）`,
+            referenceId: newCard.id,
+          },
+        });
+
+        return newCard;
+      });
+    } catch (err: any) {
+      // Check if it's a points-insufficient error (Prisma P2025 = record not found)
+      if (err.code === 'P2025' || err.message === '點數不足') {
+        return NextResponse.json({ error: '點數不足，請先購買點數' }, { status: 403 });
+      }
+      throw err;
     }
-
-    // Create card record
-    const card = await prisma.card.create({
-      data: {
-        userId,
-        originalImageUrl,
-        festival,
-        styleId,
-        styleType,
-        decorations: decorations || [],
-        greetingText,
-        extraInstructions,
-        status: 'generating',
-      },
-    });
-
-    // Deduct points
-    await prisma.user.update({
-      where: { id: userId },
-      data: { points: { decrement: POINTS_PER_CARD } },
-    });
-    await prisma.pointTransaction.create({
-      data: {
-        userId,
-        type: 'debit',
-        amount: POINTS_PER_CARD,
-        description: `製作賀卡（${festival}）`,
-        referenceId: card.id,
-      },
-    });
 
     // Build KIE prompt
     const prompt = buildKIEPrompt({
@@ -103,33 +118,35 @@ export async function POST(req: Request) {
         prompt,
         aspectRatio: cardRatio || '3:4',
       });
-    } catch (err) {
-      // KIE task creation failed — refund immediately
-      await prisma.user.update({
-        where: { id: userId },
-        data: { points: { increment: POINTS_PER_CARD } },
-      });
-      await prisma.pointTransaction.create({
-        data: {
-          userId,
-          type: 'credit',
-          amount: POINTS_PER_CARD,
-          description: `生成失敗退回點數（${festival}）`,
-          referenceId: card.id,
-        },
-      });
-      await prisma.card.update({
-        where: { id: card.id },
-        data: { status: 'failed' },
+    } catch {
+      // KIE task creation failed — refund atomically
+      await prisma.$transaction(async (tx) => {
+        await tx.user.update({
+          where: { id: userId },
+          data: { points: { increment: POINTS_PER_CARD } },
+        });
+        await tx.pointTransaction.create({
+          data: {
+            userId,
+            type: 'credit',
+            amount: POINTS_PER_CARD,
+            description: `生成失敗退回點數（${festival}）`,
+            referenceId: card.id,
+          },
+        });
+        await tx.card.update({
+          where: { id: card.id },
+          data: { status: 'failed' },
+        });
       });
 
       return NextResponse.json({
         error: '賀卡生成失敗，已退回點數',
-        card: { ...card, status: 'failed' },
+        card: { id: card.id, status: 'failed' },
       }, { status: 500 });
     }
 
-    // Save taskId and return immediately — polling will handle completion
+    // Save taskId
     await prisma.card.update({
       where: { id: card.id },
       data: { taskId },

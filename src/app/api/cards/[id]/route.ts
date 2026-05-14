@@ -35,23 +35,25 @@ export async function GET(
           card.status = 'completed';
           card.generatedImageUrl = kieResult.imageUrl;
         } else if (kieResult.state === 'failed') {
-          // Refund points
-          await prisma.user.update({
-            where: { id: session.user.id },
-            data: { points: { increment: POINTS_PER_CARD } },
-          });
-          await prisma.pointTransaction.create({
-            data: {
-              userId: session.user.id,
-              type: 'credit',
-              amount: POINTS_PER_CARD,
-              description: `生成失敗退回點數（${card.festival}）`,
-              referenceId: card.id,
-            },
-          });
-          await prisma.card.update({
-            where: { id: card.id },
-            data: { status: 'failed' },
+          // Refund points atomically
+          await prisma.$transaction(async (tx) => {
+            await tx.user.update({
+              where: { id: session.user.id },
+              data: { points: { increment: POINTS_PER_CARD } },
+            });
+            await tx.pointTransaction.create({
+              data: {
+                userId: session.user.id,
+                type: 'credit',
+                amount: POINTS_PER_CARD,
+                description: `生成失敗退回點數（${card.festival}）`,
+                referenceId: card.id,
+              },
+            });
+            await tx.card.update({
+              where: { id: card.id },
+              data: { status: 'failed' },
+            });
           });
           card.status = 'failed';
         }

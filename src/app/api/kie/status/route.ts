@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { POINTS_PER_CARD } from '@/lib/constants';
 
 // KIE AI callback endpoint
 export async function POST(req: Request) {
@@ -16,6 +17,11 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'card not found' }, { status: 404 });
     }
 
+    // Idempotency: only process if card is still 'generating'
+    if (card.status !== 'generating') {
+      return NextResponse.json({ received: true, skipped: true });
+    }
+
     if (state === 'success' && imageUrl) {
       await prisma.card.update({
         where: { id: card.id },
@@ -26,23 +32,25 @@ export async function POST(req: Request) {
         },
       });
     } else if (state === 'fail' || state === 'failed') {
-      // Refund points
-      await prisma.user.update({
-        where: { id: card.userId },
-        data: { points: { increment: 10 } },
-      });
-      await prisma.pointTransaction.create({
-        data: {
-          userId: card.userId,
-          type: 'credit',
-          amount: 10,
-          description: '生成失敗退回點數',
-          referenceId: card.id,
-        },
-      });
-      await prisma.card.update({
-        where: { id: card.id },
-        data: { status: 'failed' },
+      // Refund points atomically
+      await prisma.$transaction(async (tx) => {
+        await tx.user.update({
+          where: { id: card.userId },
+          data: { points: { increment: POINTS_PER_CARD } },
+        });
+        await tx.pointTransaction.create({
+          data: {
+            userId: card.userId,
+            type: 'credit',
+            amount: POINTS_PER_CARD,
+            description: `生成失敗退回點數（${card.festival}）`,
+            referenceId: card.id,
+          },
+        });
+        await tx.card.update({
+          where: { id: card.id },
+          data: { status: 'failed' },
+        });
       });
     }
 

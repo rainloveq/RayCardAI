@@ -26,14 +26,16 @@ export async function POST(req: Request) {
       if (userId && points) {
         const pointsNum = parseInt(points);
 
-        // Check if already processed
-        const existingOrder = await prisma.order.findFirst({
-          where: { stripeSessionId: checkoutSession.id },
-        });
+        await prisma.$transaction(async (tx) => {
+          // Check if already processed
+          const existingOrder = await tx.order.findFirst({
+            where: { stripeSessionId: checkoutSession.id },
+          });
 
-        if (!existingOrder) {
-          // Create order and add points
-          await prisma.order.create({
+          if (existingOrder) return; // Already processed, skip
+
+          // Create order
+          await tx.order.create({
             data: {
               userId,
               amountHKD: checkoutSession.amount_total / 100,
@@ -41,15 +43,18 @@ export async function POST(req: Request) {
               stripeSessionId: checkoutSession.id,
               stripePaymentIntent: checkoutSession.payment_intent,
               status: 'completed',
+              completedAt: new Date(),
             },
           });
 
-          await prisma.user.update({
+          // Add points
+          await tx.user.update({
             where: { id: userId },
             data: { points: { increment: pointsNum } },
           });
 
-          await prisma.pointTransaction.create({
+          // Record transaction
+          await tx.pointTransaction.create({
             data: {
               userId,
               type: 'credit',
@@ -57,7 +62,7 @@ export async function POST(req: Request) {
               description: `購買 ${planId || ''} ${pointsNum} 點數`,
             },
           });
-        }
+        });
       }
     }
 
