@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { requireAuth } from '@/lib/checkSession';
 import { POINTS_PER_CARD } from '@/lib/constants';
-import { generateCardImage, buildKIEPrompt } from '@/lib/kie';
+import { createKIETask, buildKIEPrompt } from '@/lib/kie';
 
 export async function GET(req: Request) {
   try {
@@ -37,6 +37,7 @@ export async function POST(req: Request) {
     const {
       originalImageUrl, festival, styleId, styleType,
       decorations, greetingText, extraInstructions, customPrompt,
+      cardRatio, textPosition, colorTone,
     } = body;
 
     // Validation
@@ -80,7 +81,7 @@ export async function POST(req: Request) {
       },
     });
 
-    // Build KIE prompt using new style system
+    // Build KIE prompt
     const prompt = buildKIEPrompt({
       styleType: styleType as 'character' | 'illustration',
       styleId,
@@ -89,25 +90,21 @@ export async function POST(req: Request) {
       decorations: decorations || [],
       greetingText,
       extraInstructions,
+      textPosition,
+      colorTone,
+      cardRatio,
     });
 
-    // Call KIE AI
+    // Create KIE AI task (async — does NOT wait for result)
+    let taskId: string | null = null;
     try {
-      const generatedImageUrl = await generateCardImage({
+      taskId = await createKIETask({
         imageUrl: originalImageUrl,
         prompt,
-      });
-
-      await prisma.card.update({
-        where: { id: card.id },
-        data: {
-          status: 'completed',
-          generatedImageUrl,
-          completedAt: new Date(),
-        },
+        aspectRatio: cardRatio || '3:4',
       });
     } catch (err) {
-      // Refund points on failure
+      // KIE task creation failed — refund immediately
       await prisma.user.update({
         where: { id: userId },
         data: { points: { increment: POINTS_PER_CARD } },
@@ -127,13 +124,23 @@ export async function POST(req: Request) {
       });
 
       return NextResponse.json({
-        card: { ...card, status: 'failed' },
         error: '賀卡生成失敗，已退回點數',
+        card: { ...card, status: 'failed' },
       }, { status: 500 });
     }
 
+    // Save taskId and return immediately — polling will handle completion
+    await prisma.card.update({
+      where: { id: card.id },
+      data: { taskId },
+    });
+
     return NextResponse.json({
-      card: await prisma.card.findUnique({ where: { id: card.id } }),
+      card: {
+        ...card,
+        taskId,
+        status: 'generating',
+      },
     });
   } catch (err) {
     console.error('Create card error:', err);

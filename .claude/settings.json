@@ -7,7 +7,23 @@
       "Bash(npx next dev *)",
       "Bash(npm install *)",
       "Bash(npm uninstall *)",
-      "Bash(npm audit *)"
+      "Bash(npm audit *)",
+      "Bash(npx vercel env ls *)",
+      "Bash(npx vercel list *)",
+      "Bash(npx vercel inspect *)",
+      "Bash(npx vercel logs *)",
+      "Bash(npx vercel alias *)",
+      "Bash(nslookup *)",
+      "Bash(ping *)",
+      "Bash(host *)",
+      "Bash(where *)",
+      "Bash(type *)",
+      "Bash(mkdir *)",
+      "Bash(touch *)",
+      "Bash(rm *)",
+      "Bash(cp *)",
+      "Bash(mv *)",
+      "mcp__Claude_in_Chrome__tabs_context_mcp"
     ]
   }
 }

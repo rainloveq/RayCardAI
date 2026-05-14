@@ -3,8 +3,9 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 enum CardStatus {
@@ -91,4 +92,13 @@ model Order {
 
   @@index([userId])
   @@index([stripeSessionId])
+}
+
+model TempUpload {
+  id        String   @id @default(uuid())
+  data      Bytes
+  mimeType  String   @default("image/jpeg")
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
 }

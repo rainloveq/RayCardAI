@@ -1,10 +1,11 @@
 import { NextResponse } from 'next/server';
+import prisma from '@/lib/prisma';
 import { requireAuth } from '@/lib/checkSession';
 import { IMAGE_CONFIG } from '@/lib/utils';
 
 export async function POST(req: Request) {
   try {
-    await requireAuth();
+    const session = await requireAuth();
 
     const formData = await req.formData();
     const file = formData.get('file') as File | null;
@@ -21,24 +22,21 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: '只接受 JPG/PNG 格式' }, { status: 400 });
     }
 
-    // If no Vercel Blob configured, use a temporary local approach
-    if (!process.env.BLOB_READ_WRITE_TOKEN) {
-      // Convert to base64 data URL for demo/dev (not suitable for production)
-      const bytes = await file.arrayBuffer();
-      const buffer = Buffer.from(bytes);
-      const base64 = buffer.toString('base64');
-      const dataUrl = `data:${file.type};base64,${base64}`;
+    // Save to database as binary — no Vercel Blob needed
+    const bytes = await file.arrayBuffer();
+    const buffer = Buffer.from(bytes);
 
-      return NextResponse.json({ url: dataUrl });
-    }
-
-    // Production: upload to Vercel Blob
-    const { put } = await import('@vercel/blob');
-    const blob = await put(`uploads/${Date.now()}-${file.name}`, file, {
-      access: 'public',
+    const upload = await prisma.tempUpload.create({
+      data: {
+        data: buffer,
+        mimeType: file.type,
+      },
     });
 
-    return NextResponse.json({ url: blob.url });
+    // Build the image URL using the request's origin
+    const url = `${new URL(req.url).origin}/api/temp/${upload.id}`;
+
+    return NextResponse.json({ url });
   } catch (err) {
     if ((err as Error).message === 'Unauthorized') {
       return NextResponse.json({ error: '請先登入' }, { status: 401 });

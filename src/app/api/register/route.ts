@@ -22,19 +22,23 @@ export async function POST(req: Request) {
 
     const passwordHash = await bcrypt.hash(password, 12);
 
+    // Create user WITHOUT nested transaction to isolate the issue
     const user = await prisma.user.create({
       data: {
         email,
         passwordHash,
         displayName,
         points: SIGNUP_BONUS,
-        transactions: {
-          create: {
-            type: 'credit',
-            amount: SIGNUP_BONUS,
-            description: '註冊贈送點數',
-          },
-        },
+      },
+    });
+
+    // Create signup bonus transaction separately
+    await prisma.pointTransaction.create({
+      data: {
+        userId: user.id,
+        type: 'credit',
+        amount: SIGNUP_BONUS,
+        description: '註冊贈送點數',
       },
     });
 

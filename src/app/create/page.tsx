@@ -1,7 +1,7 @@
 'use client';
 
 import { useSession } from 'next-auth/react';
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Header from '@/components/Header';
@@ -10,7 +10,47 @@ import Toast, { useToast } from '@/components/Toast';
 import {
   CARD_TYPES, CHARACTER_STYLES, ILLUSTRATION_STYLES,
   FESTIVAL_DECORATIONS, POINTS_PER_CARD,
+  CARD_RATIOS, TEXT_POSITIONS, COLOR_TONES,
 } from '@/lib/constants';
+
+/** Compress image to max dimension 800px, returns a smaller File/Blob */
+async function compressImage(file: File, maxDim = 800, quality = 0.8): Promise<File> {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      let { width, height } = img;
+      if (width > maxDim || height > maxDim) {
+        const ratio = Math.min(maxDim / width, maxDim / height);
+        width = Math.round(width * ratio);
+        height = Math.round(height * ratio);
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d')!;
+      ctx.drawImage(img, 0, 0, width, height);
+      canvas.toBlob((blob) => {
+        if (!blob) { reject(new Error('壓縮圖片失敗')); return; }
+        const newFile = new File([blob], file.name, { type: 'image/jpeg' });
+        resolve(newFile);
+      }, 'image/jpeg', quality);
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('讀取圖片失敗')); };
+    img.src = url;
+  });
+}
+
+/** Safely parse a fetch response as JSON; on failure return the raw text for debugging */
+async function safeJson(res: Response): Promise<{ ok: boolean; data: any; raw?: string }> {
+  const text = await res.text();
+  try {
+    return { ok: res.ok, data: JSON.parse(text) };
+  } catch {
+    return { ok: false, data: null, raw: text.slice(0, 500) };
+  }
+}
 
 export default function CreatePage() {
   const { data: session, status } = useSession();
@@ -33,9 +73,24 @@ export default function CreatePage() {
   const [decorations, setDecorations] = useState<string[]>([]);
   const [greetingText, setGreetingText] = useState('');
   const [extraInstructions, setExtraInstructions] = useState('');
+  const [cardRatio, setCardRatio] = useState('3:4');
+  const [textPosition, setTextPosition] = useState('bottom');
+  const [colorTone, setColorTone] = useState('');
 
   // Result
   const [generatedCard, setGeneratedCard] = useState<any>(null);
+  const pollIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const pollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const [pollCount, setPollCount] = useState(0);
+  const pollCountRef = useRef(0);
+
+  // Cleanup polling on unmount
+  useEffect(() => {
+    return () => {
+      if (pollIntervalRef.current) clearInterval(pollIntervalRef.current);
+      if (pollTimeoutRef.current) clearTimeout(pollTimeoutRef.current);
+    };
+  }, []);
 
   useEffect(() => {
     if (status === 'unauthenticated') router.push('/login');
@@ -44,13 +99,13 @@ export default function CreatePage() {
   useEffect(() => {
     if (session) {
       fetch('/api/user/points')
-        .then((r) => r.json())
-        .then((d) => setPoints(d.points))
+        .then((r) => r.text())
+        .then((t) => { try { const d = JSON.parse(t); setPoints(d.points); } catch {} })
         .catch(() => {});
     }
   }, [session]);
 
-  const handleImageUpload = useCallback((file: File) => {
+  const handleImageUpload = useCallback(async (file: File) => {
     if (file.size > 8 * 1024 * 1024) {
       showToast({ message: '圖片超過 8MB 限制', type: 'error' });
       return;
@@ -59,9 +114,13 @@ export default function CreatePage() {
       showToast({ message: '只接受 JPG/PNG 格式', type: 'error' });
       return;
     }
-    setImageFile(file);
-    setImagePreview(URL.createObjectURL(file));
-  }, [showToast]);
+    // Compress to 800px to keep base64 / request size small
+    showToast({ message: '正在壓縮圖片…', type: 'info' });
+    const compressed = await compressImage(file, 800, 0.8).catch(() => file);
+    setImageFile(compressed);
+    setImagePreview(URL.createObjectURL(compressed));
+    clearToast();
+  }, [showToast, clearToast]);
 
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
@@ -79,6 +138,17 @@ export default function CreatePage() {
     const key = festival === 'other' ? 'other' : festival;
     return FESTIVAL_DECORATIONS[key] || FESTIVAL_DECORATIONS.other;
   };
+
+  const pollCardStatus = useCallback(async (cardId: string) => {
+    try {
+      const res = await fetch(`/api/cards/${cardId}`);
+      const { ok, data } = await safeJson(res);
+      if (!ok) return null;
+      return data.card;
+    } catch {
+      return null;
+    }
+  }, []);
 
   const handleGenerate = async () => {
     if (!imagePreview || !festival || !styleId || !greetingText) {
@@ -99,6 +169,8 @@ export default function CreatePage() {
 
     setStep('generating');
     setProgressMsg('正在上傳圖片…');
+    setPollCount(0);
+    pollCountRef.current = 0;
 
     try {
       // Upload image
@@ -108,13 +180,13 @@ export default function CreatePage() {
         const formData = new FormData();
         formData.append('file', imageFile);
         const uploadRes = await fetch('/api/upload', { method: 'POST', body: formData });
-        const uploadData = await uploadRes.json();
-        if (!uploadRes.ok) throw new Error(uploadData.error);
+        const { ok: uploadOk, data: uploadData, raw: uploadRaw } = await safeJson(uploadRes);
+        if (!uploadOk) throw new Error(uploadData?.error || uploadRaw || '上傳失敗');
         uploadedUrl = uploadData.url;
         setImageUrl(uploadedUrl);
       }
 
-      setProgressMsg('AI 正在生成你的賀咭');
+      setProgressMsg('AI 正在製作你的賀咭（已提交）');
 
       const festivalName = festival === 'other' ? customFestival :
         CARD_TYPES.find((c) => c.id === festival)?.label || festival;
@@ -131,19 +203,65 @@ export default function CreatePage() {
           greetingText,
           extraInstructions: extraInstructions || undefined,
           customPrompt: styleId.startsWith('custom-') ? customStyleDesc : undefined,
+          cardRatio,
+          textPosition,
+          colorTone: colorTone || undefined,
         }),
       });
 
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.error || '生成失敗');
+      const { ok, data, raw } = await safeJson(res);
+      if (!ok) {
+        throw new Error(data?.error || raw || '生成失敗');
       }
 
-      setGeneratedCard(data.card);
-      setStep('result');
-      showToast({ message: '賀咭生成成功！', type: 'success' });
-      setPoints((prev) => Math.max(0, prev - POINTS_PER_CARD));
+      const cardId = data.card?.id;
+      if (!cardId) throw new Error('無法取得卡片 ID');
+
+      // Start polling for completion
+      setProgressMsg('AI 正在繪製你的賀咭，請耐心等候…');
+
+      const stopPolling = () => {
+        if (pollIntervalRef.current) clearInterval(pollIntervalRef.current);
+        if (pollTimeoutRef.current) clearTimeout(pollTimeoutRef.current);
+        pollIntervalRef.current = null;
+        pollTimeoutRef.current = null;
+      };
+
+      const MAX_POLL_ATTEMPTS = 40; // 40 × 3s = 120s
+      pollCountRef.current = 0;
+
+      const poll = async () => {
+        pollCountRef.current += 1;
+        setPollCount(pollCountRef.current);
+
+        if (pollCountRef.current >= MAX_POLL_ATTEMPTS) {
+          stopPolling();
+          showToast({ message: '生成逾時（超過 120 秒），請稍後再試', type: 'error' });
+          setStep('form');
+          return;
+        }
+
+        const card = await pollCardStatus(cardId);
+        if (!card) return;
+
+        if (card.status === 'completed') {
+          stopPolling();
+          setGeneratedCard(card);
+          setStep('result');
+          showToast({ message: '賀咭生成成功！', type: 'success' });
+          setPoints((prev) => Math.max(0, prev - POINTS_PER_CARD));
+        } else if (card.status === 'failed') {
+          stopPolling();
+          showToast({ message: '生成失敗，點數已退回', type: 'error' });
+          setStep('form');
+        }
+      };
+
+      // Initial poll after a short delay, then poll every 3s
+      pollTimeoutRef.current = setTimeout(() => {
+        poll();
+        pollIntervalRef.current = setInterval(poll, 3000);
+      }, 2000);
     } catch (err: any) {
       showToast({ message: err.message || '生成失敗，點數已退回', type: 'error' });
       setStep('form');
@@ -178,6 +296,9 @@ export default function CreatePage() {
     setDecorations([]);
     setGreetingText('');
     setExtraInstructions('');
+    setCardRatio('3:4');
+    setTextPosition('bottom');
+    setColorTone('');
     setGeneratedCard(null);
   };
 
@@ -218,6 +339,11 @@ export default function CreatePage() {
               <div className="w-16 h-16 border-3 border-amber-400 border-t-transparent rounded-full animate-spin mx-auto mb-6" />
               <p className="text-brown-600 font-medium text-lg">{progressMsg}</p>
               <p className="text-brown-400 text-sm mt-3">生成約需 60–90 秒，請耐心等候，不要關閉頁面</p>
+              {pollCount > 0 && (
+                <p className="text-brown-300 text-xs mt-2">
+                  已等待 {Math.floor(pollCount * 3)} 秒…
+                </p>
+              )}
               <div className="mt-8 flex items-center justify-center gap-2 text-xs text-brown-300">
                 <span className="w-2 h-2 bg-success rounded-full animate-pulse" />
                 <span>生成失敗自動退回點數</span>
@@ -233,7 +359,10 @@ export default function CreatePage() {
               </div>
 
               <div className="card-elevated mb-6 overflow-hidden rounded-xl">
-                <div className="aspect-[3/4] bg-cream-100 relative">
+                <div
+                  className="bg-cream-100 relative"
+                  style={{ aspectRatio: cardRatio.replace(':', '/') || '3/4' }}
+                >
                   {generatedCard.generatedImageUrl ? (
                     <img
                       src={generatedCard.generatedImageUrl}
@@ -498,6 +627,84 @@ export default function CreatePage() {
                   </div>
                 </div>
 
+                {/* Step 6: Card Ratio */}
+                <div className="card">
+                  <div className="flex items-center gap-2 mb-3">
+                    <span className="w-6 h-6 bg-amber-50 text-amber-400 text-xs rounded-full flex items-center justify-center font-medium border border-amber-200">6</span>
+                    <label className="font-medium text-brown-600 text-sm">卡片比例</label>
+                    <span className="text-xs text-brown-300 font-normal">（選填）</span>
+                  </div>
+                  <div className="flex gap-2">
+                    {CARD_RATIOS.map((r) => (
+                      <button
+                        key={r.id}
+                        onClick={() => setCardRatio(r.id)}
+                        className={`flex-1 p-3 rounded-xl text-sm border text-center transition-all ${
+                          cardRatio === r.id
+                            ? 'border-amber-400 bg-amber-50 text-amber-400 ring-1 ring-amber-400/20'
+                            : 'border-brown-100 text-brown-400 hover:border-brown-200'
+                        }`}
+                      >
+                        <div className="text-lg">{r.icon}</div>
+                        <div className="font-medium mt-0.5">{r.label}</div>
+                        <div className="text-xs text-brown-300 mt-0.5">{r.desc}</div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Step 7: Text Position */}
+                <div className="card">
+                  <div className="flex items-center gap-2 mb-3">
+                    <span className="w-6 h-6 bg-amber-50 text-amber-400 text-xs rounded-full flex items-center justify-center font-medium border border-amber-200">7</span>
+                    <label className="font-medium text-brown-600 text-sm">文字位置</label>
+                    <span className="text-xs text-brown-300 font-normal">（選填）</span>
+                  </div>
+                  <div className="flex gap-2">
+                    {TEXT_POSITIONS.map((p) => (
+                      <button
+                        key={p.id}
+                        onClick={() => setTextPosition(p.id)}
+                        className={`flex-1 p-3 rounded-xl text-sm border text-center transition-all ${
+                          textPosition === p.id
+                            ? 'border-amber-400 bg-amber-50 text-amber-400 ring-1 ring-amber-400/20'
+                            : 'border-brown-100 text-brown-400 hover:border-brown-200'
+                        }`}
+                      >
+                        <div className="text-lg">{p.icon}</div>
+                        <div className="font-medium mt-0.5">{p.label}</div>
+                        <div className="text-xs text-brown-300 mt-0.5">{p.desc}</div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Step 8: Color Tone */}
+                <div className="card">
+                  <div className="flex items-center gap-2 mb-3">
+                    <span className="w-6 h-6 bg-amber-50 text-amber-400 text-xs rounded-full flex items-center justify-center font-medium border border-amber-200">8</span>
+                    <label className="font-medium text-brown-600 text-sm">色調風格</label>
+                    <span className="text-xs text-brown-300 font-normal">（選填）</span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    {COLOR_TONES.map((t) => (
+                      <button
+                        key={t.id}
+                        onClick={() => setColorTone(t.id === colorTone ? '' : t.id)}
+                        className={`p-3 rounded-xl text-sm border text-center transition-all ${
+                          colorTone === t.id
+                            ? 'border-amber-400 bg-amber-50 text-amber-400 ring-1 ring-amber-400/20'
+                            : 'border-brown-100 text-brown-400 hover:border-brown-200'
+                        }`}
+                      >
+                        <div className="text-lg">{t.icon}</div>
+                        <div className="font-medium mt-0.5">{t.label}</div>
+                        <div className="text-xs text-brown-300 mt-0.5">{t.desc}</div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
                 {/* Extra instructions */}
                 <div className="card">
                   <label className="input-label">構圖提示（選填）</label>
@@ -516,7 +723,10 @@ export default function CreatePage() {
                   <h3 className="font-medium text-brown-600 mb-4 flex items-center gap-2">
                     <span>👁️</span> 預覽
                   </h3>
-                  <div className="aspect-[3/4] bg-gradient-to-br from-cream-100 to-cream-200 rounded-xl flex items-center justify-center mb-5 overflow-hidden">
+                  <div
+                    className="bg-gradient-to-br from-cream-100 to-cream-200 rounded-xl flex items-center justify-center mb-5 overflow-hidden"
+                    style={{ aspectRatio: cardRatio.replace(':', '/') || '3/4' }}
+                  >
                     {imagePreview ? (
                       <img
                         src={imagePreview}
@@ -556,6 +766,26 @@ export default function CreatePage() {
                         <span className="text-brown-400">裝飾</span>
                         <span className="text-brown-600 text-right max-w-[160px] truncate">
                           {decorations.join(', ')}
+                        </span>
+                      </div>
+                    )}
+                    <div className="flex justify-between">
+                      <span className="text-brown-400">比例</span>
+                      <span className="text-brown-600 font-medium">
+                        {CARD_RATIOS.find((r) => r.id === cardRatio)?.label || '3:4'}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-brown-400">文字位置</span>
+                      <span className="text-brown-600 font-medium">
+                        {TEXT_POSITIONS.find((p) => p.id === textPosition)?.label || '底部'}
+                      </span>
+                    </div>
+                    {colorTone && (
+                      <div className="flex justify-between">
+                        <span className="text-brown-400">色調</span>
+                        <span className="text-brown-600 font-medium">
+                          {COLOR_TONES.find((t) => t.id === colorTone)?.label || colorTone}
                         </span>
                       </div>
                     )}

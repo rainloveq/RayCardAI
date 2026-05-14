@@ -19,20 +19,24 @@ export default function LoginPage() {
     setError('');
     setLoading(true);
 
-    const result = await signIn('credentials', {
-      email,
-      password,
-      redirect: false,
-    });
+    try {
+      const result = await signIn('credentials', {
+        email,
+        password,
+        redirect: false,
+      });
 
-    setLoading(false);
+      if (result?.error) {
+        setError('電郵或密碼錯誤');
+        return;
+      }
 
-    if (result?.error) {
-      setError('電郵或密碼錯誤');
-      return;
+      router.push('/dashboard');
+    } catch {
+      setError('登入失敗，請稍後再試');
+    } finally {
+      setLoading(false);
     }
-
-    router.push('/dashboard');
   };
 
   return (

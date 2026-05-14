@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { requireAuth } from '@/lib/checkSession';
+import { checkKIETaskStatus } from '@/lib/kie';
+import { POINTS_PER_CARD } from '@/lib/constants';
 
 export async function GET(
   _req: Request,
@@ -14,6 +16,49 @@ export async function GET(
 
     if (!card) {
       return NextResponse.json({ error: '卡片不存在' }, { status: 404 });
+    }
+
+    // If card is still generating and has a KIE taskId, check status
+    if (card.status === 'generating' && card.taskId) {
+      try {
+        const kieResult = await checkKIETaskStatus(card.taskId);
+
+        if (kieResult.state === 'success' && kieResult.imageUrl) {
+          await prisma.card.update({
+            where: { id: card.id },
+            data: {
+              status: 'completed',
+              generatedImageUrl: kieResult.imageUrl,
+              completedAt: new Date(),
+            },
+          });
+          card.status = 'completed';
+          card.generatedImageUrl = kieResult.imageUrl;
+        } else if (kieResult.state === 'failed') {
+          // Refund points
+          await prisma.user.update({
+            where: { id: session.user.id },
+            data: { points: { increment: POINTS_PER_CARD } },
+          });
+          await prisma.pointTransaction.create({
+            data: {
+              userId: session.user.id,
+              type: 'credit',
+              amount: POINTS_PER_CARD,
+              description: `生成失敗退回點數（${card.festival}）`,
+              referenceId: card.id,
+            },
+          });
+          await prisma.card.update({
+            where: { id: card.id },
+            data: { status: 'failed' },
+          });
+          card.status = 'failed';
+        }
+        // 'processing' → no update, still waiting
+      } catch {
+        // KIE check failed (network etc.) — don't update, just return current status
+      }
     }
 
     return NextResponse.json({ card });

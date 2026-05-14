@@ -152,6 +152,25 @@ export const FESTIVAL_DECORATIONS: Record<string, string[]> = {
   other: ['星星', '心形', '花', '蝴蝶', '絲帶', '氣球', '光芒', '彩帶'],
 };
 
+export const CARD_RATIOS = [
+  { id: '3:4', label: '直向 3:4', icon: '📱', desc: '適合賀卡標準格式' },
+  { id: '4:3', label: '橫向 4:3', icon: '🖥️', desc: '適合橫幅風景構圖' },
+  { id: '1:1', label: '正方形 1:1', icon: '📐', desc: '適合社交媒體分享' },
+];
+
+export const TEXT_POSITIONS = [
+  { id: 'bottom', label: '底部', icon: '⬇️', desc: '文字顯示在卡片下方' },
+  { id: 'top', label: '頂部', icon: '⬆️', desc: '文字顯示在卡片上方' },
+  { id: 'auto', label: '由AI決定', icon: '🎯', desc: 'AI 自行安排文字位置' },
+];
+
+export const COLOR_TONES = [
+  { id: 'warm', label: '溫暖', icon: '☀️', desc: '暖金色調，溫馨舒適' },
+  { id: 'cool', label: '冷色', icon: '❄️', desc: '藍紫色調，清新優雅' },
+  { id: 'bright', label: '明亮', icon: '✨', desc: '鮮明亮麗，活力滿滿' },
+  { id: 'pastel', label: '柔和', icon: '🌸', desc: '粉彩色調，溫柔夢幻' },
+];
+
 export const POINTS_PER_CARD = 10;
 export const SIGNUP_BONUS = 20;
 
