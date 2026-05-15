@@ -1,4 +1,4 @@
-import { CHARACTER_STYLES, ILLUSTRATION_STYLES } from '@/lib/constants';
+import { CHARACTER_STYLES, ILLUSTRATION_STYLES, BACKGROUND_STYLES } from '@/lib/constants';
 
 /** Create a KIE AI task and return the taskId. Does NOT wait for completion. */
 export async function createKIETask(params: {
@@ -122,7 +122,7 @@ export async function generateCardImage(params: {
 }
 
 export function buildKIEPrompt(params: {
-  styleType: 'character' | 'illustration';
+  styleType: 'background' | 'character' | 'illustration';
   styleId: string;
   customPrompt?: string;
   festival: string;
@@ -133,13 +133,16 @@ export function buildKIEPrompt(params: {
   colorTone?: string;
   cardRatio?: string;
 }): string {
-  const styles = params.styleType === 'character' ? CHARACTER_STYLES : ILLUSTRATION_STYLES;
+  const styles =
+    params.styleType === 'background' ? BACKGROUND_STYLES :
+    params.styleType === 'character' ? CHARACTER_STYLES :
+    ILLUSTRATION_STYLES;
   const styleDef = styles.find((s) => s.id === params.styleId);
 
   const parts: string[] = [];
 
-  // CRITICAL: For character/background styles, force AI to preserve the person exactly
-  if (params.styleType === 'character') {
+  // CRITICAL: For background mode, force AI to preserve the person exactly
+  if (params.styleType === 'background') {
     parts.push('CRITICAL RULE: DO NOT modify the person in any way. Keep their exact face, body, pose, clothing, hair — 100% identical to the original photo. The person is a sticker placed on this scene. ONLY generate the background scene around them. The person must look EXACTLY the same as the original.');
   }
 
@@ -152,7 +155,7 @@ export function buildKIEPrompt(params: {
     }
   } else {
     // Fallback
-    if (params.styleType === 'character') {
+    if (params.styleType === 'background') {
       parts.push('Generate a beautiful background scene. The person in the photo stays exactly the same.');
     } else {
       parts.push('Transform this photo with a beautiful artistic style.');

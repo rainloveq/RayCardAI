@@ -8,7 +8,7 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import Toast, { useToast } from '@/components/Toast';
 import {
-  CARD_TYPES, CHARACTER_STYLES, ILLUSTRATION_STYLES,
+  CARD_TYPES, CHARACTER_STYLES, ILLUSTRATION_STYLES, BACKGROUND_STYLES,
   FESTIVAL_DECORATIONS, POINTS_PER_CARD,
   CARD_RATIOS, TEXT_POSITIONS, COLOR_TONES,
 } from '@/lib/constants';
@@ -68,7 +68,7 @@ export default function CreatePage() {
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [festival, setFestival] = useState('');
   const [customFestival, setCustomFestival] = useState('');
-  const [styleType, setStyleType] = useState<'character' | 'illustration'>('character');
+  const [styleType, setStyleType] = useState<'background' | 'character' | 'illustration'>('background');
   const [styleId, setStyleId] = useState('');
   const [customStyleDesc, setCustomStyleDesc] = useState('');
   const [decorations, setDecorations] = useState<string[]>([]);
@@ -378,7 +378,7 @@ export default function CreatePage() {
   }
 
   const currentDecos = getAvailableDecorations();
-  const selectedStyleDef = [...CHARACTER_STYLES, ...ILLUSTRATION_STYLES].find((s) => s.id === styleId);
+  const selectedStyleDef = [...BACKGROUND_STYLES, ...CHARACTER_STYLES, ...ILLUSTRATION_STYLES].find((s) => s.id === styleId);
 
   return (
     <>
@@ -648,24 +648,34 @@ export default function CreatePage() {
                     <span className="text-xs text-brown-300 font-normal">（必填）</span>
                   </div>
                   <p className="text-xs text-brown-400 mb-4">
-                    💡 背景主題：保留真人原圖，只換背景｜藝術畫風：整張圖轉換風格（仍保留樣貌）
+                    💡 真人換背景：只換場景，人物100%不變｜全卡通：變身角色，保留樣貌｜藝術畫風：整圖轉換風格
                   </p>
 
                   {/* Style type tabs */}
-                  <div className="flex gap-2 mb-4 bg-brown-50 rounded-xl p-1">
+                  <div className="flex gap-1.5 mb-4 bg-brown-50 rounded-xl p-1">
+                    <button
+                      onClick={() => { setStyleType('background'); setStyleId(''); setCustomStyleDesc(''); }}
+                      className={`flex-1 px-2.5 py-2 rounded-lg text-xs font-medium transition-all ${
+                        styleType === 'background'
+                          ? 'bg-white text-brown-600 shadow-sm'
+                          : 'text-brown-400 hover:text-brown-500'
+                      }`}
+                    >
+                      🖼️ 真人換背景
+                    </button>
                     <button
                       onClick={() => { setStyleType('character'); setStyleId(''); setCustomStyleDesc(''); }}
-                      className={`flex-1 px-4 py-2.5 rounded-lg text-sm font-medium transition-all ${
+                      className={`flex-1 px-2.5 py-2 rounded-lg text-xs font-medium transition-all ${
                         styleType === 'character'
                           ? 'bg-white text-brown-600 shadow-sm'
                           : 'text-brown-400 hover:text-brown-500'
                       }`}
                     >
-                      🖼️ 背景主題
+                      🦸 全卡通角色
                     </button>
                     <button
                       onClick={() => { setStyleType('illustration'); setStyleId(''); setCustomStyleDesc(''); }}
-                      className={`flex-1 px-4 py-2.5 rounded-lg text-sm font-medium transition-all ${
+                      className={`flex-1 px-2.5 py-2 rounded-lg text-xs font-medium transition-all ${
                         styleType === 'illustration'
                           ? 'bg-white text-brown-600 shadow-sm'
                           : 'text-brown-400 hover:text-brown-500'
@@ -677,7 +687,7 @@ export default function CreatePage() {
 
                   {/* Styles grid */}
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 max-h-64 overflow-y-auto pr-1">
-                    {(styleType === 'character' ? CHARACTER_STYLES : ILLUSTRATION_STYLES).map(
+                    {(styleType === 'background' ? BACKGROUND_STYLES : styleType === 'character' ? CHARACTER_STYLES : ILLUSTRATION_STYLES).map(
                       (s) => (
                         <button
                           key={s.id}
@@ -695,6 +705,14 @@ export default function CreatePage() {
                   </div>
 
                   {/* Custom style input */}
+                  {styleId === 'custom-background' && (
+                    <textarea
+                      value={customStyleDesc}
+                      onChange={(e) => setCustomStyleDesc(e.target.value)}
+                      placeholder="例：海灘日落背景、星空宇宙背景、森林花園…"
+                      className="w-full mt-3 h-20"
+                    />
+                  )}
                   {styleId === 'custom-character' && (
                     <textarea
                       value={customStyleDesc}

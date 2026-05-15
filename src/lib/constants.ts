@@ -12,7 +12,7 @@ export const CARD_TYPES = [
 ];
 
 // 背景主題 — 保留真人原圖，只換背景和裝飾
-export const CHARACTER_STYLES = [
+export const BACKGROUND_STYLES = [
   {
     id: 'shin-chan',
     label: '蠟筆小新',
@@ -114,9 +114,98 @@ export const CHARACTER_STYLES = [
     prompt: 'Virtual idol stage background — glowing concert stage, neon lights, colorful spotlights, futuristic J-pop vibe.',
   },
   {
-    id: 'custom-character',
+    id: 'custom-background',
     label: '自訂背景 ✏️',
     prompt: 'Custom background: ',
+  },
+];
+
+// 角色扮演 — 保留樣貌，換上角色造型（全卡通風格）
+export const CHARACTER_STYLES = [
+  {
+    id: 'shin-chan',
+    label: '蠟筆小新',
+    prompt: 'Keep the face identical. Dress this person as Crayon Shin-chan — red shirt, yellow shorts, chunky cute cartoon style, playful expression. Transform the entire image into cartoon.',
+  },
+  {
+    id: 'mario',
+    label: '馬里奧',
+    prompt: 'Keep the face identical. Dress this person as Mario — red cap, blue overalls, Mushroom Kingdom background with coins and blocks. Full Nintendo cartoon style.',
+  },
+  {
+    id: 'princess',
+    label: '公主童話',
+    prompt: 'Keep the face identical. Dress this person as a fairytale princess — elegant gown, sparkling tiara, castle background. Disney-style cartoon illustration.',
+  },
+  {
+    id: 'dragonball',
+    label: '龍珠',
+    prompt: 'Keep the face identical. Dress this person as Dragon Ball Z fighter — orange gi, spiky hair, energy aura. Akira Toriyama anime style.',
+  },
+  {
+    id: 'onepiece',
+    label: '海賊王',
+    prompt: 'Keep the face identical. Dress this person as One Piece pirate — straw hat, pirate coat, ocean ship. Eiichiro Oda anime style.',
+  },
+  {
+    id: 'doraemon',
+    label: '多啦A夢',
+    prompt: 'Keep the face identical. Dress this person in Doraemon cartoon style — cute rounded features, bright colors, gadgets nearby. Fujiko F. Fujio style.',
+  },
+  {
+    id: 'sailormoon',
+    label: '美少女戰士',
+    prompt: 'Keep the face identical. Dress as Sailor Moon — sailor fuku, flowing ribbons, magic sparkles. 90s shoujo anime style.',
+  },
+  {
+    id: 'pokemon',
+    label: '精靈訓練員',
+    prompt: 'Keep the face identical. Dress as Pokémon trainer — red cap, Poké Ball, starter companion. Pokémon game art style.',
+  },
+  {
+    id: 'hello-kitty',
+    label: 'Hello Kitty',
+    prompt: 'Keep the face identical. Sanrio Hello Kitty style — pink white palette, red bow, kawaii aesthetic, pastel dreamy background.',
+  },
+  {
+    id: 'superhero',
+    label: '超級英雄',
+    prompt: 'Keep the face identical. Dress as superhero — cape, emblem, heroic pose, city skyline. Comic book style.',
+  },
+  {
+    id: 'harrypotter',
+    label: '哈利波特',
+    prompt: 'Keep the face identical. Dress as Hogwarts wizard — black robes, wand, castle hall. Magical illustration style.',
+  },
+  {
+    id: 'spy-family',
+    label: '間諜家家酒',
+    prompt: 'Keep the face identical. Spy x Family style — elegant spy suit, clean anime art, urban background.',
+  },
+  {
+    id: 'hunter-x-hunter',
+    label: '全職獵人',
+    prompt: 'Keep the face identical. Hunter × Hunter style — green jacket, Nen aura, adventure anime art. Togashi style.',
+  },
+  {
+    id: 'festival-character',
+    label: '節日造型',
+    prompt: 'Keep the face identical. Dress in festive holiday outfit with seasonal accessories, cheerful cartoon illustration style.',
+  },
+  {
+    id: 'fantasy-world',
+    label: '幻想角色',
+    prompt: 'Keep the face identical. Transform into fantasy character — magical robes, enchanted staff, mystical background. RPG game art style.',
+  },
+  {
+    id: 'anime-idol',
+    label: '虛擬偶像',
+    prompt: 'Keep the face identical. Virtual idol style — colorful anime outfit, glowing stage, futuristic J-pop vibe.',
+  },
+  {
+    id: 'custom-character',
+    label: '自訂造型 ✏️',
+    prompt: 'Keep the face identical. Custom transformation: ',
   },
 ];
 
