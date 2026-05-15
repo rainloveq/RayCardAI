@@ -71,3 +71,31 @@ export async function GET(
     return NextResponse.json({ error: '獲取卡片失敗' }, { status: 500 });
   }
 }
+
+export async function DELETE(
+  _req: Request,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const session = await requireAuth();
+    const userId = session.user.id;
+
+    const card = await prisma.card.findFirst({
+      where: { id: params.id, userId },
+    });
+
+    if (!card) {
+      return NextResponse.json({ error: '卡片不存在' }, { status: 404 });
+    }
+
+    await prisma.card.delete({ where: { id: card.id } });
+
+    return NextResponse.json({ success: true });
+  } catch (err: any) {
+    if (err.message === 'Unauthorized') {
+      return NextResponse.json({ error: '請先登入' }, { status: 401 });
+    }
+    console.error('Delete card error:', err);
+    return NextResponse.json({ error: '刪除失敗' }, { status: 500 });
+  }
+}

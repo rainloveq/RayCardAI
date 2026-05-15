@@ -30,6 +30,21 @@ export default function HistoryPage() {
     }
   }, [session]);
 
+  const handleDelete = async (card: Card, e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
+    if (!confirm(`確定要刪除這張 ${card.festival} 賀卡嗎？此操作無法復原。`)) return;
+
+    try {
+      const res = await fetch(`/api/cards/${card.id}`, { method: 'DELETE' });
+      if (res.ok) {
+        setCards((prev) => prev.filter((c) => c.id !== card.id));
+        if (selectedCard?.id === card.id) setSelectedCard(null);
+      }
+    } catch {
+      // silently fail
+    }
+  };
+
   const handleDownload = async (card: Card) => {
     if (!card.generatedImageUrl) return;
     try {
@@ -118,8 +133,14 @@ export default function HistoryPage() {
                         📥 下載
                       </button>
                       <button
+                        onClick={(e) => handleDelete(selectedCard, e)}
+                        className="btn-secondary flex-1 text-danger"
+                      >
+                        🗑️ 刪除
+                      </button>
+                      <button
                         onClick={() => setSelectedCard(null)}
-                        className="btn-secondary flex-1"
+                        className="btn-secondary"
                       >
                         關閉
                       </button>
@@ -132,9 +153,16 @@ export default function HistoryPage() {
                 {cards.map((card) => (
                   <div
                     key={card.id}
-                    className="card p-3 cursor-pointer hover:shadow-elevated transition-all group"
+                    className="card p-3 cursor-pointer hover:shadow-elevated transition-all group relative"
                     onClick={() => setSelectedCard(card)}
                   >
+                    <button
+                      onClick={(e) => handleDelete(card, e)}
+                      className="absolute top-2 right-2 z-10 w-7 h-7 bg-white/90 hover:bg-danger hover:text-white text-brown-400 rounded-full flex items-center justify-center text-sm shadow opacity-0 group-hover:opacity-100 transition-all"
+                      title="刪除"
+                    >
+                      🗑️
+                    </button>
                     <div className="aspect-[3/4] bg-cream-100 rounded-lg mb-2 overflow-hidden">
                       {card.generatedImageUrl ? (
                         <img
