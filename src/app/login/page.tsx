@@ -42,13 +42,13 @@ export default function LoginPage() {
   return (
     <>
       <Header />
-      <main className="flex-1 flex items-center justify-center py-16 px-4 bg-gradient-to-b from-amber-50/30 to-transparent">
+      <main className="flex-1 flex items-center justify-center py-16 px-4 bg-gradient-to-b from-electric-400/5 to-transparent">
         <div className="w-full max-w-sm">
           <div className="card-elevated animate-fade-in">
             <div className="text-center mb-6">
               <div className="text-4xl mb-3">✨</div>
-              <h1 className="text-2xl font-serif font-bold text-brown-600">登入</h1>
-              <p className="text-sm text-brown-400 mt-1">歡迎回來 RayCardAI</p>
+              <h1 className="text-2xl font-serif font-bold text-ink-white">登入</h1>
+              <p className="text-sm text-ink-gray mt-1">歡迎回來 RayCardAI</p>
             </div>
 
             {error && (
@@ -89,9 +89,9 @@ export default function LoginPage() {
               </button>
             </form>
 
-            <p className="text-center text-sm text-brown-400 mt-6">
+            <p className="text-center text-sm text-ink-gray mt-6">
               還沒有帳號？{' '}
-              <Link href="/register" className="text-amber-400 font-medium hover:text-amber-500">
+              <Link href="/register" className="text-electric-300 font-medium hover:text-electric-200">
                 免費註冊
               </Link>
             </p>

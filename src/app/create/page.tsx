@@ -373,7 +373,7 @@ export default function CreatePage() {
   if (status === 'loading') {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin w-8 h-8 border-2 border-amber-400 border-t-transparent rounded-full" />
+        <div className="animate-spin w-8 h-8 border-2 border-electric-400/60 border-t-transparent rounded-full" />
       </div>
     );
   }
@@ -387,18 +387,18 @@ export default function CreatePage() {
       <main className="flex-1 py-8 px-4">
         <div className="max-w-5xl mx-auto">
           <div className="flex items-center justify-between mb-6">
-            <h1 className="text-2xl font-serif font-bold text-brown-600">
+            <h1 className="text-2xl font-serif font-bold text-ink-white">
               製作賀咭
             </h1>
             <div className="flex items-center gap-3 text-sm">
               <Link
                 href="/buy-points"
-                className="flex items-center gap-1.5 bg-amber-50 text-amber-400 font-medium px-3.5 py-1.5 rounded-full border border-amber-200/50 hover:bg-amber-100 transition-colors"
+                className="flex items-center gap-1.5 bg-electric-400/10 text-electric-300 font-medium px-3.5 py-1.5 rounded-full border border-electric-400/20 hover:bg-electric-400/20 transition-colors"
               >
                 <span>🪙</span>
                 <span>{points} 點</span>
               </Link>
-              <span className="text-brown-300 text-xs">每次消耗 {POINTS_PER_CARD} 點</span>
+              <span className="text-ink-dim text-xs">每次消耗 {POINTS_PER_CARD} 點</span>
             </div>
           </div>
 
@@ -411,15 +411,15 @@ export default function CreatePage() {
                 <div className="absolute -bottom-1 -left-2 text-xl animate-pulse">💫</div>
               </div>
 
-              <p className="text-brown-600 font-serif font-bold text-xl mb-2">
+              <p className="text-ink-white font-serif font-bold text-xl mb-2">
                 AI 正在為你繪製賀卡
               </p>
-              <p className="text-brown-400 text-sm mb-6">
+              <p className="text-ink-gray text-sm mb-6">
                 {progressMsg}
               </p>
 
               {/* Progress bar */}
-              <div className="w-full bg-cream-200 rounded-full h-3 mb-3 overflow-hidden">
+              <div className="w-full bg-cosmos-700 rounded-full h-3 mb-3 overflow-hidden">
                 <div
                   className="h-full bg-gradient-to-r from-amber-300 via-amber-400 to-amber-500 rounded-full transition-all duration-1000 ease-linear animate-pulse"
                   style={{ width: `${Math.min(pollCount * 2.5, 90)}%` }}
@@ -431,14 +431,14 @@ export default function CreatePage() {
                 {[0, 1, 2].map((i) => (
                   <span
                     key={i}
-                    className="w-2.5 h-2.5 bg-amber-400 rounded-full animate-bounce"
+                    className="w-2.5 h-2.5 bg-electric-500 rounded-full animate-bounce"
                     style={{ animationDelay: `${i * 0.15}s` }}
                   />
                 ))}
               </div>
 
               {pollCount > 0 && (
-                <p className="text-brown-400 text-sm font-medium">
+                <p className="text-ink-gray text-sm font-medium">
                   ⏱️ {Math.floor(pollCount * 3)} 秒
                   {pollCount > 10 && pollCount <= 20 && ' · 還在努力中…'}
                   {pollCount > 20 && pollCount <= 40 && ' · 快完成了，請稍候…'}
@@ -446,7 +446,7 @@ export default function CreatePage() {
                 </p>
               )}
 
-              <div className="mt-6 flex items-center justify-center gap-2 text-xs text-brown-300">
+              <div className="mt-6 flex items-center justify-center gap-2 text-xs text-ink-dim">
                 <span className="w-2 h-2 bg-success rounded-full animate-pulse" />
                 <span>失敗自動退回點數</span>
                 <span className="mx-1">·</span>
@@ -458,11 +458,11 @@ export default function CreatePage() {
           {step === 'timedOut' && (
             <div className="card-elevated text-center py-16 animate-fade-in max-w-lg mx-auto">
               <div className="text-5xl mb-4">⏳</div>
-              <p className="text-brown-600 font-medium text-lg mb-2">AI 繪製時間較長</p>
-              <p className="text-brown-400 text-sm mb-2">
+              <p className="text-ink-white font-medium text-lg mb-2">AI 繪製時間較長</p>
+              <p className="text-ink-gray text-sm mb-2">
                 已等待超過 5 分鐘，賀卡可能仍在生成中
               </p>
-              <p className="text-brown-300 text-xs mb-8">
+              <p className="text-ink-dim text-xs mb-8">
                 你可以選擇繼續等待，或取消並退回點數
               </p>
               <div className="flex items-center justify-center gap-3 flex-wrap">
@@ -487,17 +487,17 @@ export default function CreatePage() {
               {/* Celebration header */}
               <div className="text-center mb-6">
                 <div className="text-5xl mb-3 animate-bounce">🎉</div>
-                <h2 className="text-2xl font-serif font-bold text-brown-600">
+                <h2 className="text-2xl font-serif font-bold text-ink-white">
                   賀卡生成完成！
                 </h2>
-                <p className="text-brown-400 text-sm mt-1">
+                <p className="text-ink-gray text-sm mt-1">
                   你的個人化賀卡已準備好
                 </p>
               </div>
 
               <div className="card-elevated mb-6 overflow-hidden rounded-xl">
                 <div
-                  className="bg-cream-100 relative"
+                  className="bg-cosmos-800 relative"
                   style={{ aspectRatio: cardRatio.replace(':', '/') || '3/4' }}
                 >
                   {generatedCard.generatedImageUrl ? (
@@ -507,7 +507,7 @@ export default function CreatePage() {
                       className="w-full h-full object-cover"
                     />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center text-brown-300">
+                    <div className="w-full h-full flex items-center justify-center text-ink-dim">
                       圖片載入中…
                     </div>
                   )}
@@ -537,7 +537,7 @@ export default function CreatePage() {
                 </button>
               </div>
 
-              <p className="text-xs text-brown-300 text-center mt-4">
+              <p className="text-xs text-ink-dim text-center mt-4">
                 長按圖片 → 「加入相片」儲存至相簿
               </p>
             </div>
@@ -550,17 +550,17 @@ export default function CreatePage() {
                 {/* Step 1: Upload photo */}
                 <div className="card">
                   <div className="flex items-center gap-2 mb-3">
-                    <span className="w-6 h-6 bg-amber-400 text-white text-xs rounded-full flex items-center justify-center font-medium">1</span>
-                    <label className="font-medium text-brown-600 text-sm">上傳相片</label>
-                    <span className="text-xs text-brown-300 font-normal">（必填）</span>
+                    <span className="w-6 h-6 bg-electric-500 text-white text-xs rounded-full flex items-center justify-center font-medium">1</span>
+                    <label className="font-medium text-ink-white text-sm">上傳相片</label>
+                    <span className="text-xs text-ink-dim font-normal">（必填）</span>
                   </div>
-                  <p className="text-xs text-brown-400 mb-3">
+                  <p className="text-xs text-ink-gray mb-3">
                     💡 建議選用臉部清晰、人頭佔畫面較大的照片，效果更佳
                   </p>
                   <div
                     onDrop={handleDrop}
                     onDragOver={(e) => e.preventDefault()}
-                    className="border-2 border-dashed border-brown-200 rounded-xl p-8 text-center hover:border-amber-400 transition-colors cursor-pointer bg-cream-50/50"
+                    className="border-2 border-dashed border-white/[0.15] rounded-xl p-8 text-center hover:border-electric-400/60 transition-colors cursor-pointer bg-surface-card/5/50"
                     onClick={() => {
                       const input = document.createElement('input');
                       input.type = 'file';
@@ -585,7 +585,7 @@ export default function CreatePage() {
                             setImageFile(null);
                             setImageUrl(null);
                           }}
-                          className="absolute -top-2 -right-2 bg-brown-600 text-white w-6 h-6 rounded-full text-xs hover:bg-brown-700"
+                          className="absolute -top-2 -right-2 bg-cosmos-800 text-white w-6 h-6 rounded-full text-xs hover:bg-cosmos-700"
                         >
                           ✕
                         </button>
@@ -593,11 +593,11 @@ export default function CreatePage() {
                       </div>
                     ) : (
                       <>
-                        <div className="w-16 h-16 bg-cream-200 rounded-2xl flex items-center justify-center mx-auto mb-3">
+                        <div className="w-16 h-16 bg-cosmos-700 rounded-2xl flex items-center justify-center mx-auto mb-3">
                           <span className="text-3xl">📸</span>
                         </div>
-                        <p className="text-brown-600 font-medium">點擊或拖放照片至此</p>
-                        <p className="text-brown-400 text-sm mt-1">支援 JPG / PNG，最大 8MB</p>
+                        <p className="text-ink-white font-medium">點擊或拖放照片至此</p>
+                        <p className="text-ink-gray text-sm mt-1">支援 JPG / PNG，最大 8MB</p>
                       </>
                     )}
                   </div>
@@ -606,9 +606,9 @@ export default function CreatePage() {
                 {/* Step 2: Festival */}
                 <div className="card">
                   <div className="flex items-center gap-2 mb-3">
-                    <span className="w-6 h-6 bg-amber-400 text-white text-xs rounded-full flex items-center justify-center font-medium">2</span>
-                    <label className="font-medium text-brown-600 text-sm">選擇節日 / 重要時刻</label>
-                    <span className="text-xs text-brown-300 font-normal">（必填）</span>
+                    <span className="w-6 h-6 bg-electric-500 text-white text-xs rounded-full flex items-center justify-center font-medium">2</span>
+                    <label className="font-medium text-ink-white text-sm">選擇節日 / 重要時刻</label>
+                    <span className="text-xs text-ink-dim font-normal">（必填）</span>
                   </div>
                   <div className="grid grid-cols-4 sm:grid-cols-5 gap-2">
                     {CARD_TYPES.map((ct) => (
@@ -621,8 +621,8 @@ export default function CreatePage() {
                         }}
                         className={`p-2.5 rounded-xl text-sm border text-center transition-all ${
                           festival === ct.id
-                            ? 'border-amber-400 bg-amber-50 text-amber-400 ring-1 ring-amber-400/20'
-                            : 'border-brown-100 text-brown-400 hover:border-brown-200 hover:bg-brown-50'
+                            ? 'border-electric-400/60 bg-electric-400/10 text-electric-300 ring-1 ring-electric-400/20'
+                            : 'border-white/[0.10] text-ink-gray hover:border-white/[0.15] hover:bg-surface-card/5'
                         }`}
                       >
                         <div className="text-xl mb-0.5">{ct.icon}</div>
@@ -644,22 +644,22 @@ export default function CreatePage() {
                 {/* Step 3: Style */}
                 <div className="card">
                   <div className="flex items-center gap-2 mb-1">
-                    <span className="w-6 h-6 bg-amber-400 text-white text-xs rounded-full flex items-center justify-center font-medium">3</span>
-                    <label className="font-medium text-brown-600 text-sm">選擇風格</label>
-                    <span className="text-xs text-brown-300 font-normal">（必填）</span>
+                    <span className="w-6 h-6 bg-electric-500 text-white text-xs rounded-full flex items-center justify-center font-medium">3</span>
+                    <label className="font-medium text-ink-white text-sm">選擇風格</label>
+                    <span className="text-xs text-ink-dim font-normal">（必填）</span>
                   </div>
-                  <p className="text-xs text-brown-400 mb-4">
+                  <p className="text-xs text-ink-gray mb-4">
                     💡 真人換背景：只換場景，人物100%不變｜全卡通：變身角色，保留樣貌｜藝術畫風：整圖轉換風格
                   </p>
 
                   {/* Style type tabs */}
-                  <div className="flex gap-1.5 mb-4 bg-brown-50 rounded-xl p-1">
+                  <div className="flex gap-1.5 mb-4 bg-surface-card/5 rounded-xl p-1">
                     <button
                       onClick={() => { setStyleType('background'); setStyleId(''); setCustomStyleDesc(''); }}
                       className={`flex-1 px-2.5 py-2 rounded-lg text-xs font-medium transition-all ${
                         styleType === 'background'
-                          ? 'bg-white text-brown-600 shadow-sm'
-                          : 'text-brown-400 hover:text-brown-500'
+                          ? 'bg-surface-card text-ink-white shadow-sm'
+                          : 'text-ink-gray hover:text-ink-gray'
                       }`}
                     >
                       🖼️ 真人換背景
@@ -668,8 +668,8 @@ export default function CreatePage() {
                       onClick={() => { setStyleType('character'); setStyleId(''); setCustomStyleDesc(''); }}
                       className={`flex-1 px-2.5 py-2 rounded-lg text-xs font-medium transition-all ${
                         styleType === 'character'
-                          ? 'bg-white text-brown-600 shadow-sm'
-                          : 'text-brown-400 hover:text-brown-500'
+                          ? 'bg-surface-card text-ink-white shadow-sm'
+                          : 'text-ink-gray hover:text-ink-gray'
                       }`}
                     >
                       🦸 全卡通角色
@@ -678,8 +678,8 @@ export default function CreatePage() {
                       onClick={() => { setStyleType('illustration'); setStyleId(''); setCustomStyleDesc(''); }}
                       className={`flex-1 px-2.5 py-2 rounded-lg text-xs font-medium transition-all ${
                         styleType === 'illustration'
-                          ? 'bg-white text-brown-600 shadow-sm'
-                          : 'text-brown-400 hover:text-brown-500'
+                          ? 'bg-surface-card text-ink-white shadow-sm'
+                          : 'text-ink-gray hover:text-ink-gray'
                       }`}
                     >
                       🎨 藝術畫風
@@ -695,8 +695,8 @@ export default function CreatePage() {
                           onClick={() => setStyleId(s.id)}
                           className={`p-3 rounded-xl text-sm border text-center transition-all ${
                             styleId === s.id
-                              ? 'border-amber-400 bg-amber-50 text-amber-400 ring-1 ring-amber-400/20'
-                              : 'border-brown-100 text-brown-400 hover:border-brown-200 hover:bg-brown-50'
+                              ? 'border-electric-400/60 bg-electric-400/10 text-electric-300 ring-1 ring-electric-400/20'
+                              : 'border-white/[0.10] text-ink-gray hover:border-white/[0.15] hover:bg-surface-card/5'
                           }`}
                         >
                           <div className="font-medium">{s.label}</div>
@@ -736,12 +736,12 @@ export default function CreatePage() {
                 {festival && festival !== 'other' && (
                   <div className="card">
                     <div className="flex items-center gap-2 mb-3">
-                      <span className="w-6 h-6 bg-amber-50 text-amber-400 text-xs rounded-full flex items-center justify-center font-medium border border-amber-200">4</span>
-                      <label className="font-medium text-brown-600 text-sm">選擇裝飾</label>
-                      <span className="text-xs text-brown-300 font-normal">（可多選，選填）</span>
+                      <span className="w-6 h-6 bg-electric-400/10 text-electric-300 text-xs rounded-full flex items-center justify-center font-medium border border-electric-400/20">4</span>
+                      <label className="font-medium text-ink-white text-sm">選擇裝飾</label>
+                      <span className="text-xs text-ink-dim font-normal">（可多選，選填）</span>
                     </div>
                     <div className="space-y-2">
-                      <p className="text-xs text-amber-400 font-medium">🎯 推薦裝飾</p>
+                      <p className="text-xs text-electric-300 font-medium">🎯 推薦裝飾</p>
                       <div className="flex flex-wrap gap-2">
                         {currentDecos.map((d) => (
                           <button
@@ -749,8 +749,8 @@ export default function CreatePage() {
                             onClick={() => toggleDecoration(d)}
                             className={`px-3.5 py-2 rounded-xl text-sm border transition-all ${
                               decorations.includes(d)
-                                ? 'border-amber-400 bg-amber-50 text-amber-400 ring-1 ring-amber-400/20'
-                                : 'border-brown-100 text-brown-400 hover:border-brown-200'
+                                ? 'border-electric-400/60 bg-electric-400/10 text-electric-300 ring-1 ring-electric-400/20'
+                                : 'border-white/[0.10] text-ink-gray hover:border-white/[0.15]'
                             }`}
                           >
                             {d}
@@ -764,9 +764,9 @@ export default function CreatePage() {
                 {/* Greeting text */}
                 <div className="card">
                   <div className="flex items-center gap-2 mb-3">
-                    <span className="w-6 h-6 bg-amber-400 text-white text-xs rounded-full flex items-center justify-center font-medium">5</span>
-                    <label className="font-medium text-brown-600 text-sm">祝福語</label>
-                    <span className="text-xs text-brown-300 font-normal">（必填）</span>
+                    <span className="w-6 h-6 bg-electric-500 text-white text-xs rounded-full flex items-center justify-center font-medium">5</span>
+                    <label className="font-medium text-ink-white text-sm">祝福語</label>
+                    <span className="text-xs text-ink-dim font-normal">（必填）</span>
                   </div>
                   <textarea
                     value={greetingText}
@@ -784,8 +784,8 @@ export default function CreatePage() {
                         onClick={() => setGreetingText(s)}
                         className={`px-2.5 py-1 rounded-full text-xs border transition-all ${
                           greetingText === s
-                            ? 'border-amber-400 bg-amber-50 text-amber-400'
-                            : 'border-brown-100 text-brown-400 hover:border-brown-200 hover:bg-brown-50'
+                            ? 'border-electric-400/60 bg-electric-400/10 text-electric-300'
+                            : 'border-white/[0.10] text-ink-gray hover:border-white/[0.15] hover:bg-surface-card/5'
                         }`}
                       >
                         {s}
@@ -793,17 +793,17 @@ export default function CreatePage() {
                     ))}
                   </div>
                   <div className="flex items-center justify-between mt-2">
-                    <span className="text-xs text-brown-300">（不選則由 AI 自行決定文字風格）</span>
-                    <span className="text-xs text-brown-300">{greetingText.length}/500</span>
+                    <span className="text-xs text-ink-dim">（不選則由 AI 自行決定文字風格）</span>
+                    <span className="text-xs text-ink-dim">{greetingText.length}/500</span>
                   </div>
                 </div>
 
                 {/* Step 6: Card Ratio */}
                 <div className="card">
                   <div className="flex items-center gap-2 mb-3">
-                    <span className="w-6 h-6 bg-amber-50 text-amber-400 text-xs rounded-full flex items-center justify-center font-medium border border-amber-200">6</span>
-                    <label className="font-medium text-brown-600 text-sm">卡片比例</label>
-                    <span className="text-xs text-brown-300 font-normal">（選填）</span>
+                    <span className="w-6 h-6 bg-electric-400/10 text-electric-300 text-xs rounded-full flex items-center justify-center font-medium border border-electric-400/20">6</span>
+                    <label className="font-medium text-ink-white text-sm">卡片比例</label>
+                    <span className="text-xs text-ink-dim font-normal">（選填）</span>
                   </div>
                   <div className="flex gap-2">
                     {CARD_RATIOS.map((r) => (
@@ -812,13 +812,13 @@ export default function CreatePage() {
                         onClick={() => setCardRatio(r.id)}
                         className={`flex-1 p-3 rounded-xl text-sm border text-center transition-all ${
                           cardRatio === r.id
-                            ? 'border-amber-400 bg-amber-50 text-amber-400 ring-1 ring-amber-400/20'
-                            : 'border-brown-100 text-brown-400 hover:border-brown-200'
+                            ? 'border-electric-400/60 bg-electric-400/10 text-electric-300 ring-1 ring-electric-400/20'
+                            : 'border-white/[0.10] text-ink-gray hover:border-white/[0.15]'
                         }`}
                       >
                         <div className="text-lg">{r.icon}</div>
                         <div className="font-medium mt-0.5">{r.label}</div>
-                        <div className="text-xs text-brown-300 mt-0.5">{r.desc}</div>
+                        <div className="text-xs text-ink-dim mt-0.5">{r.desc}</div>
                       </button>
                     ))}
                   </div>
@@ -827,9 +827,9 @@ export default function CreatePage() {
                 {/* Step 7: Text Position */}
                 <div className="card">
                   <div className="flex items-center gap-2 mb-3">
-                    <span className="w-6 h-6 bg-amber-50 text-amber-400 text-xs rounded-full flex items-center justify-center font-medium border border-amber-200">7</span>
-                    <label className="font-medium text-brown-600 text-sm">文字位置</label>
-                    <span className="text-xs text-brown-300 font-normal">（選填）</span>
+                    <span className="w-6 h-6 bg-electric-400/10 text-electric-300 text-xs rounded-full flex items-center justify-center font-medium border border-electric-400/20">7</span>
+                    <label className="font-medium text-ink-white text-sm">文字位置</label>
+                    <span className="text-xs text-ink-dim font-normal">（選填）</span>
                   </div>
                   <div className="flex gap-2">
                     {TEXT_POSITIONS.map((p) => (
@@ -838,13 +838,13 @@ export default function CreatePage() {
                         onClick={() => setTextPosition(p.id)}
                         className={`flex-1 p-3 rounded-xl text-sm border text-center transition-all ${
                           textPosition === p.id
-                            ? 'border-amber-400 bg-amber-50 text-amber-400 ring-1 ring-amber-400/20'
-                            : 'border-brown-100 text-brown-400 hover:border-brown-200'
+                            ? 'border-electric-400/60 bg-electric-400/10 text-electric-300 ring-1 ring-electric-400/20'
+                            : 'border-white/[0.10] text-ink-gray hover:border-white/[0.15]'
                         }`}
                       >
                         <div className="text-lg">{p.icon}</div>
                         <div className="font-medium mt-0.5">{p.label}</div>
-                        <div className="text-xs text-brown-300 mt-0.5">{p.desc}</div>
+                        <div className="text-xs text-ink-dim mt-0.5">{p.desc}</div>
                       </button>
                     ))}
                   </div>
@@ -853,9 +853,9 @@ export default function CreatePage() {
                 {/* Step 8: Color Tone */}
                 <div className="card">
                   <div className="flex items-center gap-2 mb-3">
-                    <span className="w-6 h-6 bg-amber-50 text-amber-400 text-xs rounded-full flex items-center justify-center font-medium border border-amber-200">8</span>
-                    <label className="font-medium text-brown-600 text-sm">色調風格</label>
-                    <span className="text-xs text-brown-300 font-normal">（選填）</span>
+                    <span className="w-6 h-6 bg-electric-400/10 text-electric-300 text-xs rounded-full flex items-center justify-center font-medium border border-electric-400/20">8</span>
+                    <label className="font-medium text-ink-white text-sm">色調風格</label>
+                    <span className="text-xs text-ink-dim font-normal">（選填）</span>
                   </div>
                   <div className="grid grid-cols-3 gap-2">
                     {COLOR_TONES.map((t) => (
@@ -864,8 +864,8 @@ export default function CreatePage() {
                         onClick={() => setColorTone(t.id === colorTone ? '' : t.id)}
                         className={`p-2.5 rounded-xl text-xs border text-center transition-all ${
                           colorTone === t.id
-                            ? 'border-amber-400 bg-amber-50 text-amber-400 ring-1 ring-amber-400/20'
-                            : 'border-brown-100 text-brown-400 hover:border-brown-200'
+                            ? 'border-electric-400/60 bg-electric-400/10 text-electric-300 ring-1 ring-electric-400/20'
+                            : 'border-white/[0.10] text-ink-gray hover:border-white/[0.15]'
                         }`}
                       >
                         <div className="text-2xl mb-1">{t.icon}</div>
@@ -890,11 +890,11 @@ export default function CreatePage() {
               {/* Sidebar Preview (2/5) */}
               <div className="md:col-span-2">
                 <div className="card sticky top-24">
-                  <h3 className="font-medium text-brown-600 mb-4 flex items-center gap-2">
+                  <h3 className="font-medium text-ink-white mb-4 flex items-center gap-2">
                     <span>👁️</span> 預覽
                   </h3>
                   <div
-                    className="bg-gradient-to-br from-cream-100 to-cream-200 rounded-xl flex items-center justify-center mb-5 overflow-hidden"
+                    className="bg-gradient-to-br from-cosmos-800 to-cosmos-700 rounded-xl flex items-center justify-center mb-5 overflow-hidden"
                     style={{ aspectRatio: cardRatio.replace(':', '/') || '3/4' }}
                   >
                     {imagePreview ? (
@@ -904,8 +904,8 @@ export default function CreatePage() {
                         className="w-full h-full object-cover"
                       />
                     ) : (
-                      <div className="text-center text-brown-300 p-6">
-                        <div className="w-16 h-16 bg-white/60 rounded-2xl flex items-center justify-center mx-auto mb-3">
+                      <div className="text-center text-ink-dim p-6">
+                        <div className="w-16 h-16 bg-surface-card/60 rounded-2xl flex items-center justify-center mx-auto mb-3">
                           <span className="text-3xl">🖼️</span>
                         </div>
                         <p className="text-sm">上傳相片後顯示預覽</p>
@@ -914,10 +914,10 @@ export default function CreatePage() {
                   </div>
 
                   {/* Summary */}
-                  <div className="space-y-2.5 text-sm border-t border-brown-100 pt-4">
+                  <div className="space-y-2.5 text-sm border-t border-white/[0.10] pt-4">
                     <div className="flex justify-between">
-                      <span className="text-brown-400">節日</span>
-                      <span className="text-brown-600 font-medium">
+                      <span className="text-ink-gray">節日</span>
+                      <span className="text-ink-white font-medium">
                         {festival
                           ? festival === 'other'
                             ? customFestival || '—'
@@ -926,35 +926,35 @@ export default function CreatePage() {
                       </span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-brown-400">風格</span>
-                      <span className="text-brown-600 font-medium">
+                      <span className="text-ink-gray">風格</span>
+                      <span className="text-ink-white font-medium">
                         {selectedStyleDef?.label || '未選擇'}
                       </span>
                     </div>
                     {decorations.length > 0 && (
                       <div className="flex justify-between">
-                        <span className="text-brown-400">裝飾</span>
-                        <span className="text-brown-600 text-right max-w-[160px] truncate">
+                        <span className="text-ink-gray">裝飾</span>
+                        <span className="text-ink-white text-right max-w-[160px] truncate">
                           {decorations.join(', ')}
                         </span>
                       </div>
                     )}
                     <div className="flex justify-between">
-                      <span className="text-brown-400">比例</span>
-                      <span className="text-brown-600 font-medium">
+                      <span className="text-ink-gray">比例</span>
+                      <span className="text-ink-white font-medium">
                         {CARD_RATIOS.find((r) => r.id === cardRatio)?.label || '3:4'}
                       </span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-brown-400">文字位置</span>
-                      <span className="text-brown-600 font-medium">
+                      <span className="text-ink-gray">文字位置</span>
+                      <span className="text-ink-white font-medium">
                         {TEXT_POSITIONS.find((p) => p.id === textPosition)?.label || '底部'}
                       </span>
                     </div>
                     {colorTone && (
                       <div className="flex justify-between">
-                        <span className="text-brown-400">色調</span>
-                        <span className="text-brown-600 font-medium">
+                        <span className="text-ink-gray">色調</span>
+                        <span className="text-ink-white font-medium">
                           {COLOR_TONES.find((t) => t.id === colorTone)?.label || colorTone}
                         </span>
                       </div>
@@ -962,13 +962,13 @@ export default function CreatePage() {
                   </div>
 
                   {/* Fast mode toggle */}
-                  <label className="flex items-center gap-3 mt-4 p-3 bg-cream-50 rounded-xl cursor-pointer hover:bg-cream-100 transition-colors">
+                  <label className="flex items-center gap-3 mt-4 p-3 bg-surface-card/5 rounded-xl cursor-pointer hover:bg-cosmos-800 transition-colors">
                     <div className={`relative w-10 h-6 rounded-full transition-colors ${fastMode ? 'bg-success' : 'bg-brown-200'}`}>
-                      <div className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${fastMode ? 'translate-x-[18px]' : 'translate-x-0.5'}`} />
+                      <div className={`absolute top-0.5 w-5 h-5 bg-surface-card rounded-full shadow transition-transform ${fastMode ? 'translate-x-[18px]' : 'translate-x-0.5'}`} />
                     </div>
                     <div className="flex-1">
-                      <span className="text-sm font-medium text-brown-600">⚡ 快速模式</span>
-                      <span className="text-xs text-brown-300 ml-2">較快完成 · 畫質略低</span>
+                      <span className="text-sm font-medium text-ink-white">⚡ 快速模式</span>
+                      <span className="text-xs text-ink-dim ml-2">較快完成 · 畫質略低</span>
                     </div>
                     <input
                       type="checkbox"
@@ -985,14 +985,14 @@ export default function CreatePage() {
                   >
                     ✨ 立即製作（消耗 {POINTS_PER_CARD} 點）
                   </button>
-                  <p className="text-xs text-brown-300 text-center mt-2">
+                  <p className="text-xs text-ink-dim text-center mt-2">
                     {fastMode ? '⚡ 快速模式約 60–90 秒' : '🎨 高品質約 2–3 分鐘'} · 失敗自動退款
                   </p>
 
                   {points < POINTS_PER_CARD && (
-                    <div className="mt-3 p-3 bg-amber-50 rounded-xl text-center">
-                      <p className="text-xs text-amber-400">點數不足</p>
-                      <Link href="/buy-points" className="text-xs text-amber-500 font-medium underline">
+                    <div className="mt-3 p-3 bg-electric-400/10 rounded-xl text-center">
+                      <p className="text-xs text-electric-300">點數不足</p>
+                      <Link href="/buy-points" className="text-xs text-electric-200 font-medium underline">
                         點此購買點數 →
                       </Link>
                     </div>

@@ -12,7 +12,7 @@ export default function Toast({
   const bgMap = {
     success: 'bg-success text-white',
     error: 'bg-danger text-white',
-    info: 'bg-brown-600 text-white',
+    info: 'bg-cosmos-800 text-white',
   };
 
   const iconMap = {

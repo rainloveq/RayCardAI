@@ -64,7 +64,7 @@ export default function HistoryPage() {
   if (status === 'loading') {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin w-8 h-8 border-2 border-amber-400 border-t-transparent rounded-full" />
+        <div className="animate-spin w-8 h-8 border-2 border-electric-400/60 border-t-transparent rounded-full" />
       </div>
     );
   }
@@ -75,7 +75,7 @@ export default function HistoryPage() {
       <main className="flex-1 py-8 px-4">
         <div className="max-w-5xl mx-auto">
           <div className="flex items-center justify-between mb-6">
-            <h1 className="text-2xl font-serif font-bold text-brown-600">
+            <h1 className="text-2xl font-serif font-bold text-ink-white">
               歷史記錄
             </h1>
             <Link
@@ -88,12 +88,12 @@ export default function HistoryPage() {
 
           {loading ? (
             <div className="text-center py-16">
-              <div className="animate-spin w-8 h-8 border-2 border-amber-400 border-t-transparent rounded-full mx-auto" />
+              <div className="animate-spin w-8 h-8 border-2 border-electric-400/60 border-t-transparent rounded-full mx-auto" />
             </div>
           ) : cards.length === 0 ? (
             <div className="card text-center py-16">
               <div className="text-5xl mb-4">🎴</div>
-              <p className="text-brown-400 mb-3">還沒有生成記錄</p>
+              <p className="text-ink-gray mb-3">還沒有生成記錄</p>
               <Link
                 href="/create"
                 className="btn-primary inline-block"
@@ -110,10 +110,10 @@ export default function HistoryPage() {
                   onClick={() => setSelectedCard(null)}
                 >
                   <div
-                    className="bg-white rounded-xl max-w-lg w-full p-5 animate-fade-in shadow-elevated"
+                    className="bg-surface-card rounded-xl max-w-lg w-full p-5 animate-fade-in shadow-elevated"
                     onClick={(e) => e.stopPropagation()}
                   >
-                    <div className="aspect-[3/4] bg-cream-100 rounded-lg overflow-hidden mb-4">
+                    <div className="aspect-[3/4] bg-cosmos-800 rounded-lg overflow-hidden mb-4">
                       {selectedCard.generatedImageUrl && (
                         <img
                           src={selectedCard.generatedImageUrl}
@@ -122,7 +122,7 @@ export default function HistoryPage() {
                         />
                       )}
                     </div>
-                    <div className="text-center text-sm text-brown-400 mb-4">
+                    <div className="text-center text-sm text-ink-gray mb-4">
                       {selectedCard.festival} · {formatDate(selectedCard.createdAt)}
                     </div>
                     <div className="flex gap-2">
@@ -158,12 +158,12 @@ export default function HistoryPage() {
                   >
                     <button
                       onClick={(e) => handleDelete(card, e)}
-                      className="absolute top-2 right-2 z-10 w-7 h-7 bg-white/90 hover:bg-danger hover:text-white text-brown-400 rounded-full flex items-center justify-center text-sm shadow opacity-0 group-hover:opacity-100 transition-all"
+                      className="absolute top-2 right-2 z-10 w-7 h-7 bg-cosmos-900/80 hover:bg-danger hover:text-white text-ink-gray rounded-full flex items-center justify-center text-sm shadow opacity-0 group-hover:opacity-100 transition-all"
                       title="刪除"
                     >
                       🗑️
                     </button>
-                    <div className="aspect-[3/4] bg-cream-100 rounded-lg mb-2 overflow-hidden">
+                    <div className="aspect-[3/4] bg-cosmos-800 rounded-lg mb-2 overflow-hidden">
                       {card.generatedImageUrl ? (
                         <img
                           src={card.generatedImageUrl}
@@ -171,26 +171,26 @@ export default function HistoryPage() {
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                         />
                       ) : card.status === 'failed' ? (
-                        <div className="w-full h-full flex items-center justify-center text-brown-300 text-sm">
+                        <div className="w-full h-full flex items-center justify-center text-ink-dim text-sm">
                           生成失敗
                         </div>
                       ) : (
-                        <div className="w-full h-full flex items-center justify-center text-brown-300 text-sm">
+                        <div className="w-full h-full flex items-center justify-center text-ink-dim text-sm">
                           ⏳ 生成中…
                         </div>
                       )}
                     </div>
-                    <div className="text-xs font-medium text-brown-600 truncate">
+                    <div className="text-xs font-medium text-ink-white truncate">
                       {card.festival}
                     </div>
-                    <div className="text-xs text-brown-300">
+                    <div className="text-xs text-ink-dim">
                       {formatDate(card.createdAt)}
                     </div>
                     {card.status === 'failed' && (
                       <div className="text-xs text-danger mt-1">⚠ 生成失敗</div>
                     )}
                     {card.status === 'generating' && (
-                      <div className="text-xs text-amber-400 mt-1">⏳ 生成中</div>
+                      <div className="text-xs text-electric-300 mt-1">⏳ 生成中</div>
                     )}
                   </div>
                 ))}

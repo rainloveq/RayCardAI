@@ -20,11 +20,11 @@ export default function Header() {
   }, [session]);
 
   return (
-    <header className="bg-white/90 backdrop-blur-sm border-b border-brown-100/60 sticky top-0 z-50">
+    <header className="bg-cosmos-900/80 backdrop-blur-sm border-b border-white/[0.10] sticky top-0 z-50">
       <div className="max-w-5xl mx-auto px-4 h-16 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-2.5 group">
           <span className="text-2xl group-hover:scale-110 transition-transform">✨</span>
-          <span className="font-serif text-lg font-bold text-brown-600 tracking-tight">
+          <span className="font-serif text-lg font-bold text-ink-white tracking-tight">
             RayCardAI
           </span>
         </Link>
@@ -47,7 +47,7 @@ export default function Header() {
               {points !== null && (
                 <Link
                   href="/buy-points"
-                  className="flex items-center gap-1.5 text-sm bg-amber-50 text-amber-400 font-medium px-3.5 py-1.5 rounded-full hover:bg-amber-100 transition-colors border border-amber-200/50"
+                  className="flex items-center gap-1.5 text-sm bg-electric-400/10 text-electric-300 font-medium px-3.5 py-1.5 rounded-full hover:bg-electric-400/20 transition-colors border border-electric-400/20"
                 >
                   <span className="text-base">🪙</span>
                   <span>{points}</span>
@@ -61,7 +61,7 @@ export default function Header() {
               </Link>
               <button
                 onClick={() => signOut({ callbackUrl: '/' })}
-                className="btn-ghost text-sm text-brown-400 hidden sm:inline-flex"
+                className="btn-ghost text-sm text-ink-gray hidden sm:inline-flex"
               >
                 登出
               </button>

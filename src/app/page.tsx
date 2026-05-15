@@ -13,49 +13,49 @@ export default function HomePage() {
         <section className="relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-b from-amber-50/40 to-transparent" />
           <div className="max-w-5xl mx-auto px-4 pt-20 pb-24 text-center relative">
-            <div className="inline-flex items-center gap-2 bg-amber-50 text-amber-400 text-sm px-4 py-1.5 rounded-full mb-6 border border-amber-200/50">
+            <div className="inline-flex items-center gap-2 bg-electric-400/10 text-electric-300 text-sm px-4 py-1.5 rounded-full mb-6 border border-electric-400/20">
               <span>✨</span>
               <span>AI 個人化賀咭生成平台</span>
             </div>
-            <h1 className="text-4xl md:text-5xl font-serif font-bold text-brown-600 leading-tight mb-4 text-balance">
+            <h1 className="text-4xl md:text-5xl font-serif font-bold text-ink-white leading-tight mb-4 text-balance">
               上傳相片，AI 為你生成
               <br />
-              <span className="text-amber-400">獨一無二的賀咭</span>
+              <span className="text-electric-300">獨一無二的賀咭</span>
             </h1>
-            <p className="text-brown-400 text-lg max-w-lg mx-auto mb-8">
+            <p className="text-ink-gray text-lg max-w-lg mx-auto mb-8">
               上傳你的照片，選擇節日風格，AI 為你生成充滿個人色彩的賀咭圖片。
             </p>
             <div className="flex items-center justify-center gap-3">
               <Link
                 href="/register"
-                className="bg-amber-400 text-white px-8 py-3 rounded-xl font-medium text-base hover:bg-amber-500 active:scale-[0.98] transition-all shadow-lg shadow-amber-400/25"
+                className="bg-electric-500 text-white px-8 py-3 rounded-xl font-medium text-base hover:bg-electric-400/100 active:scale-[0.98] transition-all shadow-lg shadow-amber-400/25"
               >
                 立即免費試用
               </Link>
               <Link
                 href="/login"
-                className="bg-white text-brown-600 px-8 py-3 rounded-xl font-medium text-base border border-brown-200 hover:bg-brown-50 active:scale-[0.98] transition-all"
+                className="bg-surface-card text-ink-white px-8 py-3 rounded-xl font-medium text-base border border-white/[0.15] hover:bg-surface-card/5 active:scale-[0.98] transition-all"
               >
                 我已有帳號
               </Link>
             </div>
             <div className="mt-6 flex items-center justify-center gap-4 text-sm">
               <span className="text-success font-medium">🎁 新用戶免費 20 點</span>
-              <span className="text-brown-200">·</span>
-              <span className="text-brown-400">生成失敗自動退款</span>
-              <span className="text-brown-200">·</span>
-              <span className="text-brown-400">按需購買，無月費</span>
+              <span className="text-ink-dim">·</span>
+              <span className="text-ink-gray">生成失敗自動退款</span>
+              <span className="text-ink-dim">·</span>
+              <span className="text-ink-gray">按需購買，無月費</span>
             </div>
           </div>
         </section>
 
         {/* How it works — 四步完成 */}
-        <section className="bg-white py-16">
+        <section className="bg-surface-card py-16">
           <div className="max-w-5xl mx-auto px-4">
-            <h2 className="text-2xl font-serif font-bold text-center text-brown-600 mb-2">
+            <h2 className="text-2xl font-serif font-bold text-center text-ink-white mb-2">
               四步完成
             </h2>
-            <p className="text-brown-400 text-center mb-12 max-w-md mx-auto">
+            <p className="text-ink-gray text-center mb-12 max-w-md mx-auto">
               填寫以下資料，AI 即時為你生成
             </p>
             <div className="grid md:grid-cols-4 gap-6">
@@ -70,16 +70,16 @@ export default function HomePage() {
                   desc: '一鍵下載或分享至相簿，留為紀念' },
               ].map((item) => (
                 <div key={item.step} className="text-center p-6">
-                  <div className="w-14 h-14 bg-amber-50 rounded-2xl flex items-center justify-center mx-auto mb-4 text-2xl">
+                  <div className="w-14 h-14 bg-electric-400/10 rounded-2xl flex items-center justify-center mx-auto mb-4 text-2xl">
                     {item.icon}
                   </div>
-                  <div className="text-xs font-medium text-amber-400 uppercase tracking-wider mb-1">
+                  <div className="text-xs font-medium text-electric-300 uppercase tracking-wider mb-1">
                     步驟 {item.step}
                   </div>
-                  <h3 className="font-serif font-semibold text-brown-600 mb-2">
+                  <h3 className="font-serif font-semibold text-ink-white mb-2">
                     {item.title}
                   </h3>
-                  <p className="text-brown-400 text-sm leading-relaxed">{item.desc}</p>
+                  <p className="text-ink-gray text-sm leading-relaxed">{item.desc}</p>
                 </div>
               ))}
             </div>
@@ -87,12 +87,12 @@ export default function HomePage() {
         </section>
 
         {/* Features */}
-        <section className="py-16 bg-surface">
+        <section className="py-16 bg-cosmos-950">
           <div className="max-w-5xl mx-auto px-4">
-            <h2 className="text-2xl font-serif font-bold text-center text-brown-600 mb-4">
+            <h2 className="text-2xl font-serif font-bold text-center text-ink-white mb-4">
               為什麼選擇 RayCardAI？
             </h2>
-            <p className="text-brown-400 text-center mb-10 max-w-xl mx-auto">
+            <p className="text-ink-gray text-center mb-10 max-w-xl mx-auto">
               讓每張賀咭都獨一無二
             </p>
             <div className="grid md:grid-cols-3 gap-6">
@@ -106,8 +106,8 @@ export default function HomePage() {
               ].map((item) => (
                 <div key={item.title} className="card text-center p-8 hover:shadow-elevated transition-shadow">
                   <div className="text-3xl mb-4">{item.icon}</div>
-                  <h3 className="font-serif font-semibold text-brown-600 mb-2">{item.title}</h3>
-                  <p className="text-brown-400 text-sm leading-relaxed">{item.desc}</p>
+                  <h3 className="font-serif font-semibold text-ink-white mb-2">{item.title}</h3>
+                  <p className="text-ink-gray text-sm leading-relaxed">{item.desc}</p>
                 </div>
               ))}
             </div>
@@ -124,19 +124,19 @@ export default function HomePage() {
             <h2 className="text-3xl font-serif font-bold mb-3">
               準備好製作你的第一張賀咭了嗎？
             </h2>
-            <p className="text-amber-200/80 mb-8">
+            <p className="text-electric-300/80 mb-8">
               註冊即送 20 點，馬上體驗 AI 賀咭的魅力
             </p>
             <div className="flex items-center justify-center gap-3">
               <Link
                 href="/register"
-                className="bg-amber-400 text-white px-8 py-3 rounded-xl font-medium hover:bg-amber-500 transition-colors"
+                className="bg-electric-500 text-white px-8 py-3 rounded-xl font-medium hover:bg-electric-400/100 transition-colors"
               >
                 免費開始使用
               </Link>
               <Link
                 href="/login"
-                className="bg-white/10 text-white px-8 py-3 rounded-xl font-medium border border-white/20 hover:bg-white/20 transition-colors"
+                className="bg-surface-card/10 text-white px-8 py-3 rounded-xl font-medium border border-white/[0.20] hover:bg-surface-card/20 transition-colors"
               >
                 登入
               </Link>

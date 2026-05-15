@@ -10,10 +10,10 @@ export default function PaymentCancelPage() {
         <div className="text-center animate-fade-in">
           <div className="card-elevated max-w-sm mx-auto">
             <div className="text-5xl mb-4">😅</div>
-            <h1 className="text-2xl font-serif font-bold text-brown-600 mb-2">
+            <h1 className="text-2xl font-serif font-bold text-ink-white mb-2">
               付款未完成
             </h1>
-            <p className="text-brown-400 mb-6">
+            <p className="text-ink-gray mb-6">
               付款已取消，你的帳戶沒有被扣除任何費用
             </p>
             <div className="flex flex-col gap-3">

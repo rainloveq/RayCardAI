@@ -55,26 +55,26 @@ export default function PaymentSuccessContent() {
   return (
     <>
       <Header />
-      <main className="flex-1 flex items-center justify-center py-16 px-4 bg-gradient-to-b from-amber-50/30 to-transparent">
+      <main className="flex-1 flex items-center justify-center py-16 px-4 bg-gradient-to-b from-electric-400/5 to-transparent">
         <div className="text-center animate-fade-in">
           {status === 'loading' && (
             <div>
-              <div className="animate-spin w-12 h-12 border-2 border-amber-400 border-t-transparent rounded-full mx-auto mb-4" />
-              <p className="text-brown-600 font-medium">驗證付款中…</p>
-              <p className="text-brown-400 text-sm mt-2">請稍候，正在確認付款並發放點數</p>
+              <div className="animate-spin w-12 h-12 border-2 border-electric-400/60 border-t-transparent rounded-full mx-auto mb-4" />
+              <p className="text-ink-white font-medium">驗證付款中…</p>
+              <p className="text-ink-gray text-sm mt-2">請稍候，正在確認付款並發放點數</p>
             </div>
           )}
 
           {status === 'success' && (
             <div className="card-elevated max-w-sm mx-auto">
               <div className="text-5xl mb-4">🎉</div>
-              <h1 className="text-2xl font-serif font-bold text-brown-600 mb-2">
+              <h1 className="text-2xl font-serif font-bold text-ink-white mb-2">
                 付款成功！
               </h1>
-              <p className="text-brown-400 mb-2">
+              <p className="text-ink-gray mb-2">
                 你的點數已成功發放至帳戶
               </p>
-              <p className="text-xs text-brown-300 mb-6">
+              <p className="text-xs text-ink-dim mb-6">
                 可在主頁查看剩餘點數
               </p>
               <div className="flex flex-col gap-3">
@@ -91,13 +91,13 @@ export default function PaymentSuccessContent() {
           {status === 'error' && (
             <div className="card-elevated max-w-sm mx-auto">
               <div className="text-5xl mb-4">🤔</div>
-              <h1 className="text-2xl font-serif font-bold text-brown-600 mb-2">
+              <h1 className="text-2xl font-serif font-bold text-ink-white mb-2">
                 付款確認中
               </h1>
-              <p className="text-brown-400 mb-4">
+              <p className="text-ink-gray mb-4">
                 {errorMsg || '付款已成功，但點數發放需要一些時間'}
               </p>
-              <p className="text-xs text-brown-300 mb-6">
+              <p className="text-xs text-ink-dim mb-6">
                 系統會透過 Webhook 自動補發點數，請稍後查看主頁
               </p>
               <div className="flex flex-col gap-3">

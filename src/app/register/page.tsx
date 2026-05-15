@@ -78,13 +78,13 @@ export default function RegisterPage() {
   return (
     <>
       <Header />
-      <main className="flex-1 flex items-center justify-center py-16 px-4 bg-gradient-to-b from-amber-50/30 to-transparent">
+      <main className="flex-1 flex items-center justify-center py-16 px-4 bg-gradient-to-b from-electric-400/5 to-transparent">
         <div className="w-full max-w-sm">
           <div className="card-elevated animate-fade-in">
             <div className="text-center mb-6">
               <div className="text-4xl mb-3">🎁</div>
-              <h1 className="text-2xl font-serif font-bold text-brown-600">免費註冊</h1>
-              <p className="text-sm text-brown-400 mt-1">
+              <h1 className="text-2xl font-serif font-bold text-ink-white">免費註冊</h1>
+              <p className="text-sm text-ink-gray mt-1">
                 新用戶自動獲得 20 點（可生成 2 張賀咭）
               </p>
             </div>
@@ -153,13 +153,13 @@ export default function RegisterPage() {
               </button>
             </form>
 
-            <div className="mt-4 p-3 bg-amber-50 rounded-xl text-xs text-center text-amber-400">
+            <div className="mt-4 p-3 bg-electric-400/10 rounded-xl text-xs text-center text-electric-300">
               🎉 註冊即送 20 點 · 生成失敗自動退款
             </div>
 
-            <p className="text-center text-sm text-brown-400 mt-4">
+            <p className="text-center text-sm text-ink-gray mt-4">
               已有帳號？{' '}
-              <Link href="/login" className="text-amber-400 font-medium hover:text-amber-500">
+              <Link href="/login" className="text-electric-300 font-medium hover:text-electric-200">
                 登入
               </Link>
             </p>

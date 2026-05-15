@@ -5,59 +5,94 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        cream: {
-          50: '#F8F8F7',
-          100: '#F0EDE8',
-          200: '#E0DACF',
-          300: '#C8BFAF',
-          400: '#A8987D',
-          500: '#8F7B5C',
+        // Dark tech backgrounds
+        cosmos: {
+          950: '#06060E',
+          900: '#0A0B1A',
+          800: '#0E1025',
+          700: '#141830',
+          600: '#1A1F3D',
         },
-        brown: {
-          50: '#E8E3DA',
-          100: '#D0C8B8',
-          200: '#A89B85',
-          300: '#80705A',
-          400: '#5C4E3A',
-          500: '#4A3F2F',
-          600: '#34322D',
-          700: '#2A2824',
-          800: '#1F1E1A',
-          900: '#1A1A19',
+        // Electric blue accent
+        electric: {
+          50: '#E8F0FE',
+          100: '#C5DAFC',
+          200: '#9EC3FA',
+          300: '#6BA5F7',
+          400: '#3B82F6',
+          500: '#2563EB',
+          600: '#1D4ED8',
         },
-        amber: {
-          50: '#FFF5E6',
-          100: '#FFE0B3',
-          200: '#FFC280',
-          300: '#FFA54D',
-          400: '#DD7400',
-          500: '#B85E00',
-          600: '#8C4800',
+        // Purple glow accent
+        plasma: {
+          50: '#F3E8FF',
+          100: '#E2CDFC',
+          200: '#C9A0FA',
+          300: '#A855F7',
+          400: '#9333EA',
+          500: '#7C3AED',
+          600: '#6D28D9',
         },
+        // Cyan neon
+        neon: {
+          50: '#ECFEFF',
+          100: '#CFFAFE',
+          200: '#A5F3FC',
+          300: '#67E8F9',
+          400: '#22D3EE',
+          500: '#06B6D4',
+          600: '#0891B2',
+        },
+        // Surface / glass
         surface: {
-          DEFAULT: '#F8F8F7',
-          card: '#FFFFFF',
-          hover: '#F0EDE8',
+          glass: 'rgba(255,255,255,0.05)',
+          card: 'rgba(255,255,255,0.06)',
+          hover: 'rgba(255,255,255,0.08)',
+          border: 'rgba(255,255,255,0.08)',
+        },
+        // White with opacity support
+        white: {
+          DEFAULT: '#FFFFFF',
+          5: 'rgba(255,255,255,0.05)',
+          8: 'rgba(255,255,255,0.08)',
+          10: 'rgba(255,255,255,0.10)',
+          15: 'rgba(255,255,255,0.15)',
+          20: 'rgba(255,255,255,0.20)',
+        },
+        // Text
+        ink: {
+          white: '#F1F5F9',
+          gray: '#94A3B8',
+          dim: '#64748B',
         },
         success: {
-          DEFAULT: '#00C758',
-          light: '#E6F9ED',
+          DEFAULT: '#22D3EE',
+          light: 'rgba(34,211,238,0.15)',
         },
         danger: {
-          DEFAULT: '#DC4444',
-          light: '#FDE8E8',
+          DEFAULT: '#F87171',
+          light: 'rgba(248,113,113,0.15)',
         },
       },
       fontFamily: {
         serif: ['Playfair Display', 'Noto Serif TC', 'serif'],
-        sans: ['Noto Sans TC', 'sans-serif'],
+        sans: ['Inter', 'Noto Sans TC', 'sans-serif'],
       },
       borderRadius: {
-        card: '12px',
+        card: '16px',
       },
       boxShadow: {
-        card: '0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)',
-        elevated: '0 4px 12px rgba(0,0,0,0.08)',
+        glow: '0 0 20px rgba(59,130,246,0.15)',
+        'glow-lg': '0 0 40px rgba(59,130,246,0.2), 0 0 80px rgba(124,58,237,0.1)',
+        card: '0 1px 2px rgba(0,0,0,0.3), 0 0 1px rgba(255,255,255,0.05)',
+        elevated: '0 8px 32px rgba(0,0,0,0.4), 0 0 1px rgba(255,255,255,0.08)',
+      },
+      backgroundImage: {
+        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
+        'grid-pattern': 'linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px)',
+      },
+      backgroundSize: {
+        'grid': '60px 60px',
       },
     },
   },
