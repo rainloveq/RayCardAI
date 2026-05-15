@@ -11,6 +11,7 @@ import {
   CARD_TYPES, CHARACTER_STYLES, ILLUSTRATION_STYLES, BACKGROUND_STYLES,
   FESTIVAL_DECORATIONS, POINTS_PER_CARD,
   CARD_RATIOS, TEXT_POSITIONS, COLOR_TONES,
+  GREETING_SUGGESTIONS,
 } from '@/lib/constants';
 
 /** Compress image to max dimension 800px, returns a smaller File/Blob */
@@ -774,7 +775,24 @@ export default function CreatePage() {
                     className="w-full h-24 resize-none"
                     maxLength={500}
                   />
-                  <div className="flex items-center justify-between mt-1">
+                  {/* Greeting suggestions */}
+                  <div className="mt-2 flex flex-wrap gap-1.5">
+                    {GREETING_SUGGESTIONS.map((s) => (
+                      <button
+                        key={s}
+                        type="button"
+                        onClick={() => setGreetingText(s)}
+                        className={`px-2.5 py-1 rounded-full text-xs border transition-all ${
+                          greetingText === s
+                            ? 'border-amber-400 bg-amber-50 text-amber-400'
+                            : 'border-brown-100 text-brown-400 hover:border-brown-200 hover:bg-brown-50'
+                        }`}
+                      >
+                        {s}
+                      </button>
+                    ))}
+                  </div>
+                  <div className="flex items-center justify-between mt-2">
                     <span className="text-xs text-brown-300">（不選則由 AI 自行決定文字風格）</span>
                     <span className="text-xs text-brown-300">{greetingText.length}/500</span>
                   </div>
@@ -839,20 +857,20 @@ export default function CreatePage() {
                     <label className="font-medium text-brown-600 text-sm">色調風格</label>
                     <span className="text-xs text-brown-300 font-normal">（選填）</span>
                   </div>
-                  <div className="grid grid-cols-2 gap-2">
+                  <div className="grid grid-cols-3 gap-2">
                     {COLOR_TONES.map((t) => (
                       <button
                         key={t.id}
                         onClick={() => setColorTone(t.id === colorTone ? '' : t.id)}
-                        className={`p-3 rounded-xl text-sm border text-center transition-all ${
+                        className={`p-2.5 rounded-xl text-xs border text-center transition-all ${
                           colorTone === t.id
                             ? 'border-amber-400 bg-amber-50 text-amber-400 ring-1 ring-amber-400/20'
                             : 'border-brown-100 text-brown-400 hover:border-brown-200'
                         }`}
                       >
-                        <div className="text-lg">{t.icon}</div>
-                        <div className="font-medium mt-0.5">{t.label}</div>
-                        <div className="text-xs text-brown-300 mt-0.5">{t.desc}</div>
+                        <div className="text-base mb-1">{t.icon}</div>
+                        <div className="text-lg mb-0.5 tracking-wider">{t.preview}</div>
+                        <div className="font-medium">{t.label}</div>
                       </button>
                     ))}
                   </div>

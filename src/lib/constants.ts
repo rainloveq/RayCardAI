@@ -1,12 +1,17 @@
 export const CARD_TYPES = [
   { id: 'birthday', label: '生日', icon: '🎂' },
-  { id: 'christmas', label: '聖誕節', icon: '🎄' },
+  { id: 'valentine', label: '情人節', icon: '💕' },
   { id: 'lunarnewyear', label: '農曆新年', icon: '🧧' },
-  { id: 'easter', label: '復活節', icon: '🐣' },
-  { id: 'halloween', label: '萬聖節', icon: '🎃' },
+  { id: 'christmas', label: '聖誕節', icon: '🎄' },
+  { id: 'newyear', label: '新一年', icon: '🎉' },
+  { id: 'anniversary', label: '紀念日', icon: '💍' },
   { id: 'graduation', label: '畢業', icon: '🎓' },
   { id: 'baby', label: 'BB出世', icon: '👶' },
-  { id: 'newyear', label: '新一年', icon: '🎉' },
+  { id: 'travel', label: '旅行', icon: '✈️' },
+  { id: 'holiday', label: '放假', icon: '🏖️' },
+  { id: 'offwork', label: '放工', icon: '🍻' },
+  { id: 'halloween', label: '萬聖節', icon: '🎃' },
+  { id: 'easter', label: '復活節', icon: '🐣' },
   { id: 'retirement', label: '退休', icon: '🌴' },
   { id: 'other', label: '其他', icon: '✨' },
 ];
@@ -319,6 +324,31 @@ export const FESTIVAL_DECORATIONS: Record<string, string[]> = {
     '海灘', '釣魚竿', '望遠鏡', '地圖', '向日葵', '躺椅', '熱氣球', '郵輪',
     '咖啡', '護照', '行李箱', '花園', '鳥兒', '山水畫', '陶藝',
   ],
+  valentine: [
+    '玫瑰花', '心形', '巧克力', '燭光', '紅絲帶', '香檳', '戒指', '情書',
+    '愛心氣球', '鴿子', '貝殼', '星星', '花朵拱門', '粉色絲帶', '鑽石', '音樂盒',
+    '馬卡龍', '草莓', '羽毛', '水晶燈', '紅唇', '天鵝', '蝴蝶',
+  ],
+  anniversary: [
+    '玫瑰花', '戒指', '香檳杯', '心形', '燭光', '蛋糕', '氣球', '禮物盒',
+    '情書', '合照框', '星星', '絲帶', '鑽石', '音樂盒', '貝殼', '花環',
+    '巧克力', '水晶', '紅酒', '天鵝', '珍珠', '蝴蝶', '燭台',
+  ],
+  travel: [
+    '飛機', '地圖', '護照', '行李箱', '相機', '太陽眼鏡', '棕櫚樹', '海灘',
+    '熱氣球', '指南針', '望遠鏡', '郵輪', '火車', '日出', '燈塔', '帆船',
+    '背包', '沙灘拖鞋', '貝殼', '海鷗', '冰淇淋', '明信片', '星空',
+  ],
+  holiday: [
+    '沙灘', '太陽', '棕櫚樹', '吊床', '雞尾酒', '太陽眼鏡', '游泳圈', '貝殼',
+    '海鷗', '帆船', '日落', '冰淇淋', '衝浪板', '椰子', '夏威夷花環', '躺椅',
+    '風鈴', '燈塔', '海星', '珊瑚', '浮潛面鏡', '沙堡', '比堅尼',
+  ],
+  offwork: [
+    '啤酒杯', '雞尾酒', '香檳', '披薩', '音樂', '煙花', '氣球', '彩帶',
+    '薯條', '漢堡', '燒烤', '卡拉OK', '喇叭', '派對帽', '螢光棒', '笑臉',
+    '酒杯', 'DJ台', '燈串', '沙發', '爆谷', '禮炮', '星星',
+  ],
   other: [
     '星星', '心形', '花', '蝴蝶', '絲帶', '氣球', '光芒', '彩帶',
     '羽毛', '音符', '水滴', '月亮', '太陽', '雲朵', '寶石', '貝殼',
@@ -339,10 +369,26 @@ export const TEXT_POSITIONS = [
 ];
 
 export const COLOR_TONES = [
-  { id: 'warm', label: '溫暖', icon: '☀️', desc: '暖金色調，溫馨舒適' },
-  { id: 'cool', label: '冷色', icon: '❄️', desc: '藍紫色調，清新優雅' },
-  { id: 'bright', label: '明亮', icon: '✨', desc: '鮮明亮麗，活力滿滿' },
-  { id: 'pastel', label: '柔和', icon: '🌸', desc: '粉彩色調，溫柔夢幻' },
+  { id: 'warm', label: '溫暖', icon: '☀️', desc: '暖金橙調，溫馨舒適', preview: '🟠🟡🟤' },
+  { id: 'cool', label: '冷色', icon: '❄️', desc: '藍紫冰調，清新優雅', preview: '🔵🟣🔷' },
+  { id: 'bright', label: '明亮', icon: '✨', desc: '鮮明亮麗，活力滿滿', preview: '🟡🟢🔴' },
+  { id: 'pastel', label: '柔和', icon: '🌸', desc: '粉彩夢幻，溫柔甜美', preview: '🩷🩵🩶' },
+  { id: 'golden', label: '金黃', icon: '🌟', desc: '奢華金光，高貴氣派', preview: '🟨🟧✨' },
+  { id: 'forest', label: '森林', icon: '🌿', desc: '自然綠意，清新療癒', preview: '🟢🌿🟩' },
+  { id: 'sunset', label: '夕陽', icon: '🌅', desc: '橙紅紫霞，浪漫迷人', preview: '🟧🟥🟪' },
+  { id: 'ocean', label: '海洋', icon: '🌊', desc: '藍綠清涼，自由奔放', preview: '🔵🟢🩵' },
+  { id: 'vintage', label: '復古', icon: '📷', desc: '懷舊暖棕，經典情懷', preview: '🟫🟨⬜' },
+  { id: 'neon', label: '霓虹', icon: '💜', desc: '螢光炫彩，潮流電音', preview: '🟪💗🟦' },
+  { id: 'monochrome', label: '黑白', icon: '🖤', desc: '經典黑白，極簡高雅', preview: '⬛⬜🩶' },
+  { id: 'candy', label: '糖果', icon: '🍬', desc: '繽紛甜美，少女心爆棚', preview: '🍬🍭🩷' },
+];
+
+export const GREETING_SUGGESTIONS = [
+  '生日快樂 🎂', '新年快樂 🎉', '恭喜發財 🧧', '聖誕快樂 🎄',
+  '我愛你 ❤️', 'I Love You 💕', '謝謝你 🙏', '夢想成真 ⭐',
+  '大賺特賺 💰', '世界和平 ☮️', '身體健康 💪', '萬事如意 🍀',
+  '前程似錦 🌈', '幸福美滿 🏡', '旅途愉快 ✈️', '乾杯 🍻',
+  '加油 💪', '天天開心 😊', '青春常駐 🌸', '工作順利 📈',
 ];
 
 export const POINTS_PER_CARD = 10;
