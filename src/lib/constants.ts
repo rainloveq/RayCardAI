@@ -11,171 +11,171 @@ export const CARD_TYPES = [
   { id: 'other', label: '其他', icon: '✨' },
 ];
 
-// 角色變身類 — 保留真人樣貌，換上不同造型
+// 背景主題 — 保留真人原圖，只換背景和裝飾
 export const CHARACTER_STYLES = [
   {
     id: 'shin-chan',
     label: '蠟筆小新',
-    prompt: 'Keep the face identical. Dress this person as Crayon Shin-chan — red shirt, yellow shorts, chunky cute cartoon style, playful expression.',
+    prompt: 'Crayon Shin-chan themed background — Nohara family living room, bright cartoon colors, playful Japanese home setting with toys and snacks.',
   },
   {
     id: 'mario',
     label: '馬里奧',
-    prompt: 'Keep the face identical. Dress this person as Mario — red cap, blue overalls, mustache, Mushroom Kingdom background with coins.',
+    prompt: 'Super Mario Mushroom Kingdom background — colorful blocks, gold coins, green pipes, blue sky with clouds, fun Nintendo game world.',
   },
   {
     id: 'princess',
-    label: '公主造型',
-    prompt: 'Keep the face identical. Dress this person as a fairytale princess — elegant flowing gown, sparkling tiara, castle background.',
+    label: '公主童話',
+    prompt: 'Fairytale princess castle background — elegant ballroom with chandeliers, rose petals, golden sparkles, magical royal atmosphere.',
   },
   {
     id: 'dragonball',
-    label: '龍珠戰士',
-    prompt: 'Keep the face identical. Dress this person as a Dragon Ball Z fighter — orange gi, spiky hair, glowing energy aura, dynamic battle pose.',
+    label: '龍珠',
+    prompt: 'Dragon Ball Z battlefield background — rocky terrain, glowing orange sky, energy aura effects, dramatic anime scene.',
   },
   {
     id: 'onepiece',
     label: '海賊王',
-    prompt: 'Keep the face identical. Dress this person as a One Piece pirate — straw hat, pirate coat, ocean ship background, adventurous vibe.',
+    prompt: 'One Piece pirate ship background — wooden deck, ocean waves, treasure chest, Jolly Roger flag, blue sea and sky.',
   },
   {
     id: 'doraemon',
     label: '多啦A夢',
-    prompt: 'Keep the face identical. Transform into Doraemon cartoon style — cute rounded features, bright colors, friendly expression, gadgets nearby.',
+    prompt: 'Doraemon cartoon background — Nobita room with desk and window, cute gadgets, soft pastel colors, nostalgic Japanese home.',
   },
   {
     id: 'sailormoon',
     label: '美少女戰士',
-    prompt: 'Keep the face identical. Dress as Sailor Moon — sailor fuku uniform, flowing ribbons, sparkling magic effects, 90s shoujo anime style.',
+    prompt: 'Sailor Moon magical background — crescent moon, sparkling stars, pink and blue cosmic space, elegant crystal palace.',
   },
   {
     id: 'pokemon',
     label: '精靈訓練員',
-    prompt: 'Keep the face identical. Dress as a Pokémon trainer — red cap, Poké Ball in hand, cute starter Pokémon companion, bright adventure colors.',
+    prompt: 'Pokémon world background — green meadow, Poké Ball pattern, cute starter Pokémon silhouettes, bright blue sky, grassy field.',
   },
   {
     id: 'hello-kitty',
     label: 'Hello Kitty',
-    prompt: 'Keep the face identical. Sanrio Hello Kitty style — soft pink white palette, red bow, cute kawaii aesthetic, pastel dreamy background.',
+    prompt: 'Hello Kitty Sanrio background — soft pink room, bows and ribbons, cute pastel decorations, fluffy clouds and hearts.',
   },
   {
     id: 'superhero',
     label: '超級英雄',
-    prompt: 'Keep the face identical. Dress as a superhero — dramatic cape, emblem on chest, heroic pose, cinematic city skyline, epic lighting.',
+    prompt: 'Superhero city skyline background — dramatic sunset, skyscrapers, comic book halftone dots, epic cinematic lighting.',
   },
   {
     id: 'harrypotter',
-    label: '哈利波特巫師',
-    prompt: 'Keep the face identical. Dress as a Hogwarts wizard — black robes, house scarf, magic wand with sparkles, castle interior.',
+    label: '哈利波特',
+    prompt: 'Hogwarts castle background — grand hall with floating candles, house banners, magical bookshelves, warm fireplace glow.',
   },
   {
     id: 'spy-family',
     label: '間諜家家酒',
-    prompt: 'Keep the face identical. Spy x Family style — elegant spy suit, clean anime art, sophisticated urban background.',
+    prompt: 'Spy x Family elegant background — sophisticated European city street, classy café, warm sunset lighting, stylish anime aesthetic.',
   },
   {
     id: 'hunter-x-hunter',
     label: '全職獵人',
-    prompt: 'Keep the face identical. Hunter × Hunter style — green hunter jacket, Nen aura around hands, Hunter badge, adventurous anime art style.',
+    prompt: 'Hunter × Hunter adventure background — Greed Island landscape, ruins and forests, Nen energy glow, mysterious ancient ruins.',
   },
   {
     id: 'festival-character',
-    label: '節日造型',
-    prompt: 'Keep the face identical. Dress this person in festive holiday outfit with seasonal accessories, celebrating joyfully, warm lighting.',
+    label: '節日背景',
+    prompt: 'Festive celebration background — holiday decorations, warm lighting, cheerful atmosphere with seasonal ornaments and colors.',
   },
   {
     id: 'professional',
-    label: '職業造型',
-    prompt: 'Keep the face identical. Dress this person in professional attire — suit, uniform, or formal wear, confident pose, workplace setting.',
+    label: '職場背景',
+    prompt: 'Professional office background — modern workspace, clean desk, natural window light, sophisticated corporate atmosphere.',
   },
   {
     id: 'cultural',
-    label: '傳統服飾',
-    prompt: 'Keep the face identical. Dress this person in traditional cultural attire — authentic ethnic clothing, elegant details, rich heritage.',
+    label: '傳統文化',
+    prompt: 'Traditional cultural background — classic architecture, lanterns, elegant silk fabrics, rich heritage atmosphere.',
   },
   {
     id: 'fantasy-world',
     label: '幻想世界',
-    prompt: 'Keep the face identical. Transform into a fantasy character — magical outfit, enchanted surroundings, mystical lighting, dreamy atmosphere.',
+    prompt: 'Fantasy world background — floating islands, magical forest, glowing crystals, ethereal lighting, dreamy enchanted realm.',
   },
   {
     id: 'childhood',
-    label: '童年版本',
-    prompt: 'Keep the face identical but younger. Transform into childhood self — youthful features, playful expression, nostalgic warm tones.',
+    label: '童年回憶',
+    prompt: 'Nostalgic childhood background — playground, warm afternoon sun, retro toys, soft golden light, heartwarming atmosphere.',
   },
   {
     id: 'anime-footballer',
     label: '日本運動番',
-    prompt: 'Keep the face identical. Japanese sports anime style — dynamic action pose, anime shading, team jersey, stadium background.',
+    prompt: 'Japanese sports anime background — bright stadium, team banners, dramatic lighting, energetic shounen art style, action lines.',
   },
   {
     id: 'anime-idol',
     label: '虛擬偶像',
-    prompt: 'Keep the face identical. Virtual idol style — colorful anime outfit, glowing stage lights, charismatic performer presence, futuristic vibe.',
+    prompt: 'Virtual idol stage background — glowing concert stage, neon lights, colorful spotlights, futuristic J-pop vibe.',
   },
   {
     id: 'custom-character',
-    label: '自訂造型 ✏️',
-    prompt: 'Keep the face identical. Custom transformation: ',
+    label: '自訂背景 ✏️',
+    prompt: 'Custom background: ',
   },
 ];
 
-// 藝術插畫類 — 轉換畫風
+// 藝術畫風 — 整張圖轉換畫風（人物 + 背景一同轉換）
 export const ILLUSTRATION_STYLES = [
   {
     id: 'anime',
     label: '日式動漫',
-    prompt: 'Transform this photo into a Japanese anime illustration. Clean linework, soft shading, natural colors, cinematic lighting. Keep face recognizable.',
+    prompt: 'Transform the ENTIRE image into Japanese anime illustration — clean linework, soft shading, cinematic lighting. Preserve the person appearance faithfully in anime style.',
   },
   {
     id: 'watercolor',
     label: '水彩插畫',
-    prompt: 'Transform this photo into a watercolor painting. Soft brush strokes, color bleeding, light airy feeling. Keep face recognizable.',
+    prompt: 'Transform the ENTIRE image into watercolor painting — soft brush strokes, color bleeding, light airy feeling. Preserve the person appearance faithfully.',
   },
   {
     id: '3d-cartoon',
     label: '3D卡通',
-    prompt: 'Transform into stylized 3D cartoon — soft rounded features, toy-like Pixar appearance. Keep face recognizable.',
+    prompt: 'Transform the ENTIRE image into 3D Pixar-style cartoon — soft rounded features, toy-like appearance. Preserve the person faithfully in 3D cartoon style.',
   },
   {
     id: 'chibi',
     label: 'Q版公仔',
-    prompt: 'Transform this photo into a chibi character — big head, small body, soft colors, cute clean design. Keep face recognizable.',
+    prompt: 'Transform the ENTIRE image into chibi style — big head, small body, soft colors, cute clean design. Preserve the person faithfully as a chibi character.',
   },
   {
     id: 'sketch',
     label: '簡筆素描',
-    prompt: 'Transform this photo into a pencil sketch portrait — fine lines, shading details, realistic hand-drawn style. Keep face recognizable.',
+    prompt: 'Transform the ENTIRE image into pencil sketch portrait — fine lines, shading details, hand-drawn style. Preserve the person faithfully in sketch style.',
   },
   {
     id: 'flat-illustration',
     label: '扁平插畫',
-    prompt: 'Transform into flat illustration — clean vector-like shapes, solid colors, minimal shading, modern stylish. Keep face recognizable.',
+    prompt: 'Transform the ENTIRE image into flat illustration — clean vector shapes, solid colors, minimal shading. Preserve the person faithfully in flat art style.',
   },
   {
     id: 'warm-illustration',
     label: '溫暖插畫',
-    prompt: 'Transform into warm illustration — soft golden tones, cozy atmosphere, gentle lighting. Keep face recognizable.',
+    prompt: 'Transform the ENTIRE image into warm illustration — soft golden tones, cozy atmosphere, gentle lighting. Preserve the person faithfully.',
   },
   {
     id: 'children-book',
     label: '童書插畫',
-    prompt: 'Transform into children book illustration — whimsical storybook feel, soft pastel colors, magical charm. Keep face recognizable.',
+    prompt: 'Transform the ENTIRE image into children book illustration — whimsical storybook feel, soft pastel colors. Preserve the person faithfully.',
   },
   {
     id: 'pastel',
     label: '粉彩插畫',
-    prompt: 'Transform into pastel illustration — soft powdery colors, gentle transitions, dreamy delicate. Keep face recognizable.',
+    prompt: 'Transform the ENTIRE image into pastel illustration — soft powdery colors, gentle transitions, dreamy look. Preserve the person faithfully.',
   },
   {
     id: 'bold-brush',
     label: '粗筆插畫',
-    prompt: 'Transform into bold brush illustration — thick expressive strokes, strong textures, artistic vibrant. Keep face recognizable.',
+    prompt: 'Transform the ENTIRE image into bold brush illustration — thick expressive strokes, strong textures. Preserve the person faithfully.',
   },
   {
     id: 'line-art',
     label: '線條插畫',
-    prompt: 'Transform into line art — clean delicate linework, hand-drawn thin lines, elegant minimal. Keep face recognizable.',
+    prompt: 'Transform the ENTIRE image into line art — clean delicate linework, elegant minimal style. Preserve the person faithfully.',
   },
   {
     id: 'custom-illustration',

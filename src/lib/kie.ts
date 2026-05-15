@@ -138,6 +138,11 @@ export function buildKIEPrompt(params: {
 
   const parts: string[] = [];
 
+  // CRITICAL: For character/background styles, force AI to preserve the person exactly
+  if (params.styleType === 'character') {
+    parts.push('CRITICAL RULE: DO NOT modify the person in any way. Keep their exact face, body, pose, clothing, hair — 100% identical to the original photo. The person is a sticker placed on this scene. ONLY generate the background scene around them. The person must look EXACTLY the same as the original.');
+  }
+
   // Base style prompt
   if (styleDef) {
     if (params.styleId.startsWith('custom-')) {
@@ -148,7 +153,7 @@ export function buildKIEPrompt(params: {
   } else {
     // Fallback
     if (params.styleType === 'character') {
-      parts.push('Keep the face identical. Transform this person with a creative style.');
+      parts.push('Generate a beautiful background scene. The person in the photo stays exactly the same.');
     } else {
       parts.push('Transform this photo with a beautiful artistic style.');
     }

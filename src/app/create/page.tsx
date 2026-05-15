@@ -648,7 +648,7 @@ export default function CreatePage() {
                     <span className="text-xs text-brown-300 font-normal">（必填）</span>
                   </div>
                   <p className="text-xs text-brown-400 mb-4">
-                    （角色變身保留樣貌，藝術插畫轉換畫風）
+                    💡 背景主題：保留真人原圖，只換背景｜藝術畫風：整張圖轉換風格（仍保留樣貌）
                   </p>
 
                   {/* Style type tabs */}
@@ -661,7 +661,7 @@ export default function CreatePage() {
                           : 'text-brown-400 hover:text-brown-500'
                       }`}
                     >
-                      角色變身類
+                      🖼️ 背景主題
                     </button>
                     <button
                       onClick={() => { setStyleType('illustration'); setStyleId(''); setCustomStyleDesc(''); }}
@@ -671,7 +671,7 @@ export default function CreatePage() {
                           : 'text-brown-400 hover:text-brown-500'
                       }`}
                     >
-                      藝術插畫類
+                      🎨 藝術畫風
                     </button>
                   </div>
 
