@@ -75,14 +75,14 @@ export default function PaymentSuccessContent() {
                 你的點數已成功發放至帳戶
               </p>
               <p className="text-xs text-brown-300 mb-6">
-                可在儀表板查看剩餘點數
+                可在主頁查看剩餘點數
               </p>
               <div className="flex flex-col gap-3">
                 <Link href="/create" className="btn-primary text-center !py-3">
                   ✨ 立即製作賀咭
                 </Link>
                 <Link href="/dashboard" className="btn-secondary text-center">
-                  返回儀表板
+                  返回主頁
                 </Link>
               </div>
             </div>
@@ -98,11 +98,11 @@ export default function PaymentSuccessContent() {
                 {errorMsg || '付款已成功，但點數發放需要一些時間'}
               </p>
               <p className="text-xs text-brown-300 mb-6">
-                系統會透過 Webhook 自動補發點數，請稍後查看儀表板
+                系統會透過 Webhook 自動補發點數，請稍後查看主頁
               </p>
               <div className="flex flex-col gap-3">
                 <Link href="/dashboard" className="btn-primary inline-block text-center">
-                  查看儀表板
+                  查看主頁
                 </Link>
                 <Link href="/create" className="btn-secondary text-center">
                   返回製作賀咭

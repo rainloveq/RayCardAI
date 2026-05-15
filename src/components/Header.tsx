@@ -36,7 +36,7 @@ export default function Header() {
                 href="/dashboard"
                 className="btn-ghost text-sm hidden sm:inline-flex"
               >
-                儀表板
+                主頁
               </Link>
               <Link
                 href="/history"

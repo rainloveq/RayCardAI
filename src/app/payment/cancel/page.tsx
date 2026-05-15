@@ -21,7 +21,7 @@ export default function PaymentCancelPage() {
                 重新選擇方案
               </Link>
               <Link href="/dashboard" className="btn-secondary text-center">
-                返回儀表板
+                返回主頁
               </Link>
             </div>
           </div>
