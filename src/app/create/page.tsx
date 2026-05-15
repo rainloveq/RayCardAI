@@ -58,7 +58,8 @@ export default function CreatePage() {
   const { toast, showToast, clearToast } = useToast();
 
   const [points, setPoints] = useState<number>(0);
-  const [step, setStep] = useState<'form' | 'generating' | 'result'>('form');
+  const [step, setStep] = useState<'form' | 'generating' | 'timedOut' | 'result'>('form');
+  const currentCardIdRef = useRef<string | null>(null);
   const [progressMsg, setProgressMsg] = useState('');
 
   // Form state
@@ -216,6 +217,7 @@ export default function CreatePage() {
 
       const cardId = data.card?.id;
       if (!cardId) throw new Error('無法取得卡片 ID');
+      currentCardIdRef.current = cardId;
 
       // Start polling for completion
       setProgressMsg('AI 正在繪製你的賀咭，請耐心等候…');
@@ -227,7 +229,7 @@ export default function CreatePage() {
         pollTimeoutRef.current = null;
       };
 
-      const MAX_POLL_ATTEMPTS = 40; // 40 × 3s = 120s
+      const MAX_POLL_ATTEMPTS = 100; // 100 × 3s = 300s (5 min)
       pollCountRef.current = 0;
 
       const poll = async () => {
@@ -236,8 +238,7 @@ export default function CreatePage() {
 
         if (pollCountRef.current >= MAX_POLL_ATTEMPTS) {
           stopPolling();
-          showToast({ message: '生成逾時（超過 120 秒），請稍後再試', type: 'error' });
-          setStep('form');
+          setStep('timedOut');
           return;
         }
 
@@ -266,6 +267,68 @@ export default function CreatePage() {
       showToast({ message: err.message || '生成失敗，點數已退回', type: 'error' });
       setStep('form');
     }
+  };
+
+  const handleContinueWaiting = () => {
+    const cardId = currentCardIdRef.current;
+    if (!cardId) {
+      setStep('form');
+      return;
+    }
+    setStep('generating');
+    pollCountRef.current = 0;
+    setPollCount(0);
+
+    const poll = async () => {
+      pollCountRef.current += 1;
+      setPollCount(pollCountRef.current);
+
+      if (pollCountRef.current >= 100) {
+        if (pollIntervalRef.current) clearInterval(pollIntervalRef.current);
+        setStep('timedOut');
+        return;
+      }
+
+      const card = await pollCardStatus(cardId);
+      if (!card) return;
+
+      if (card.status === 'completed') {
+        if (pollIntervalRef.current) clearInterval(pollIntervalRef.current);
+        setGeneratedCard(card);
+        setStep('result');
+        showToast({ message: '賀咭生成成功！', type: 'success' });
+        setPoints((prev) => Math.max(0, prev - POINTS_PER_CARD));
+      } else if (card.status === 'failed') {
+        if (pollIntervalRef.current) clearInterval(pollIntervalRef.current);
+        showToast({ message: '生成失敗，點數已退回', type: 'error' });
+        setStep('form');
+      }
+    };
+
+    poll();
+    pollIntervalRef.current = setInterval(poll, 3000);
+  };
+
+  const handleCancelGeneration = async () => {
+    const cardId = currentCardIdRef.current;
+    if (!cardId) {
+      setStep('form');
+      return;
+    }
+    showToast({ message: '正在取消…', type: 'info' });
+    try {
+      const res = await fetch(`/api/cards/${cardId}/cancel`, { method: 'POST' });
+      const { ok, data } = await safeJson(res);
+      if (ok && data.success) {
+        showToast({ message: '已取消，點數已退回', type: 'info' });
+      } else {
+        showToast({ message: data?.error || '取消失敗' , type: 'error' });
+      }
+    } catch {
+      showToast({ message: '取消失敗，請稍後再試', type: 'error' });
+    }
+    setStep('form');
+    currentCardIdRef.current = null;
   };
 
   const handleDownload = async () => {
@@ -300,6 +363,7 @@ export default function CreatePage() {
     setTextPosition('bottom');
     setColorTone('');
     setGeneratedCard(null);
+    currentCardIdRef.current = null;
   };
 
   if (status === 'loading') {
@@ -338,7 +402,7 @@ export default function CreatePage() {
             <div className="card-elevated text-center py-24 animate-fade-in max-w-lg mx-auto">
               <div className="w-16 h-16 border-3 border-amber-400 border-t-transparent rounded-full animate-spin mx-auto mb-6" />
               <p className="text-brown-600 font-medium text-lg">{progressMsg}</p>
-              <p className="text-brown-400 text-sm mt-3">生成約需 60–90 秒，請耐心等候，不要關閉頁面</p>
+              <p className="text-brown-400 text-sm mt-3">生成約需 2–5 分鐘，請耐心等候，不要關閉頁面</p>
               {pollCount > 0 && (
                 <p className="text-brown-300 text-xs mt-2">
                   已等待 {Math.floor(pollCount * 3)} 秒…
@@ -347,6 +411,33 @@ export default function CreatePage() {
               <div className="mt-8 flex items-center justify-center gap-2 text-xs text-brown-300">
                 <span className="w-2 h-2 bg-success rounded-full animate-pulse" />
                 <span>生成失敗自動退回點數</span>
+              </div>
+            </div>
+          )}
+
+          {step === 'timedOut' && (
+            <div className="card-elevated text-center py-16 animate-fade-in max-w-lg mx-auto">
+              <div className="text-5xl mb-4">⏳</div>
+              <p className="text-brown-600 font-medium text-lg mb-2">AI 繪製時間較長</p>
+              <p className="text-brown-400 text-sm mb-2">
+                已等待超過 5 分鐘，賀卡可能仍在生成中
+              </p>
+              <p className="text-brown-300 text-xs mb-8">
+                你可以選擇繼續等待，或取消並退回點數
+              </p>
+              <div className="flex items-center justify-center gap-3 flex-wrap">
+                <button
+                  onClick={handleContinueWaiting}
+                  className="btn-primary !px-6 !py-3"
+                >
+                  🔄 繼續等待
+                </button>
+                <button
+                  onClick={handleCancelGeneration}
+                  className="btn-secondary !px-6 !py-3"
+                >
+                  ↩️ 取消並退回點數
+                </button>
               </div>
             </div>
           )}
