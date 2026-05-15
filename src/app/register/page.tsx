@@ -1,11 +1,25 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+
+function getPasswordStrength(pw: string): { score: number; label: string; color: string } {
+  if (!pw) return { score: 0, label: '', color: '' };
+  let score = 0;
+  if (pw.length >= 8) score++;
+  if (pw.length >= 12) score++;
+  if (/[a-z]/.test(pw) && /[A-Z]/.test(pw)) score++;
+  if (/[0-9]/.test(pw)) score++;
+  if (/[^a-zA-Z0-9]/.test(pw)) score++;
+  if (score <= 2) return { score: 1, label: '弱', color: 'bg-danger' };
+  if (score <= 3) return { score: 2, label: '一般', color: 'bg-amber-400' };
+  if (score <= 4) return { score: 3, label: '強', color: 'bg-electric-400' };
+  return { score: 4, label: '很強', color: 'bg-success' };
+}
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -19,34 +33,55 @@ export default function RegisterPage() {
   const [loading, setLoading] = useState(false);
   const [socialLoading, setSocialLoading] = useState('');
 
+  const pwStrength = useMemo(() => getPasswordStrength(form.password), [form.password]);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
+    setError('');
+  };
+
+  const validate = (): string | null => {
+    if (!form.displayName.trim()) return '請輸入名稱';
+    if (form.displayName.length > 50) return '名稱不能超過 50 個字元';
+    if (!form.email) return '請輸入電郵';
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+    if (!emailRegex.test(form.email)) return '請輸入有效的電郵地址';
+    if (form.password.length < 8) return '密碼至少需要 8 個字元';
+    if (!/[a-zA-Z]/.test(form.password)) return '密碼需包含至少一個英文字母';
+    if (!/[0-9]/.test(form.password)) return '密碼需包含至少一個數字';
+    if (form.password !== form.confirmPassword) return '兩次密碼不一致';
+    return null;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
-    if (form.password !== form.confirmPassword) {
-      setError('密碼不一致');
-      return;
-    }
-
-    if (form.password.length < 6) {
-      setError('密碼至少需要 6 個字元');
-      return;
-    }
+    const validationError = validate();
+    if (validationError) { setError(validationError); return; }
 
     setLoading(true);
 
     try {
+      // Get reCAPTCHA token (if configured)
+      let recaptchaToken = '';
+      if (typeof window !== 'undefined' && (window as any).grecaptcha) {
+        try {
+          recaptchaToken = await (window as any).grecaptcha.execute(
+            process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || '',
+            { action: 'register' }
+          );
+        } catch {}
+      }
+
       const res = await fetch('/api/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           email: form.email,
           password: form.password,
-          displayName: form.displayName,
+          displayName: form.displayName.trim(),
+          recaptchaToken: recaptchaToken || undefined,
         }),
       });
 
@@ -58,20 +93,20 @@ export default function RegisterPage() {
         return;
       }
 
-      // Auto login after register
-      const loginResult = await signIn('credentials', {
+      // Auto sign-in after registration
+      const result = await signIn('credentials', {
         email: form.email,
         password: form.password,
         redirect: false,
       });
 
-      if (loginResult?.ok) {
+      if (result?.ok) {
         router.push('/dashboard');
       } else {
         router.push('/login');
       }
     } catch {
-      setError('網路錯誤，請稍後再試');
+      setError('網絡錯誤，請稍後再試');
       setLoading(false);
     }
   };
@@ -83,16 +118,14 @@ export default function RegisterPage() {
         <div className="w-full max-w-sm">
           <div className="card-elevated animate-fade-in">
             <div className="text-center mb-6">
-              <div className="text-4xl mb-3">🎁</div>
-              <h1 className="text-2xl font-serif font-bold text-ink-white">免費註冊</h1>
-              <p className="text-sm text-ink-gray mt-1">
-                新用戶自動獲得 20 點（可生成 2 張賀咭）
-              </p>
+              <div className="text-4xl mb-3">✨</div>
+              <h1 className="text-2xl font-serif font-bold text-ink-white">註冊</h1>
+              <p className="text-sm text-ink-gray mt-1">建立你的 RayCardAI 帳戶</p>
             </div>
 
             {error && (
-              <div className="bg-danger-light text-danger text-sm px-4 py-2.5 rounded-xl mb-4">
-                {error}
+              <div className="bg-danger-light text-danger text-sm px-4 py-2.5 rounded-xl mb-4 flex items-center gap-2">
+                <span>⚠️</span> {error}
               </div>
             )}
 
@@ -106,6 +139,7 @@ export default function RegisterPage() {
                   placeholder="你的名字"
                   className="w-full"
                   required
+                  maxLength={50}
                 />
               </div>
               <div>
@@ -127,11 +161,29 @@ export default function RegisterPage() {
                   type="password"
                   value={form.password}
                   onChange={handleChange}
-                  placeholder="至少 6 個字元"
+                  placeholder="至少 8 個字元，含英文及數字"
                   className="w-full"
                   required
-                  minLength={6}
+                  minLength={8}
                 />
+                {/* Password strength indicator */}
+                {form.password && (
+                  <div className="mt-2">
+                    <div className="flex gap-1 mb-1">
+                      {[1, 2, 3, 4].map((i) => (
+                        <div
+                          key={i}
+                          className={`h-1.5 flex-1 rounded-full transition-all ${
+                            i <= pwStrength.score ? pwStrength.color : 'bg-white/[0.08]'
+                          }`}
+                        />
+                      ))}
+                    </div>
+                    <p className="text-xs" style={{ color: pwStrength.color === 'bg-danger' ? '#F87171' : pwStrength.color === 'bg-amber-400' ? '#FBBF24' : pwStrength.color === 'bg-electric-400' ? '#60A5FA' : '#22D3EE' }}>
+                      密碼強度：{pwStrength.label}
+                    </p>
+                  </div>
+                )}
               </div>
               <div>
                 <label className="input-label">確認密碼</label>
@@ -141,16 +193,19 @@ export default function RegisterPage() {
                   value={form.confirmPassword}
                   onChange={handleChange}
                   placeholder="再次輸入密碼"
-                  className="w-full"
+                  className={`w-full ${form.confirmPassword && form.password !== form.confirmPassword ? 'ring-2 ring-danger/30 border-danger' : ''}`}
                   required
                 />
+                {form.confirmPassword && form.password !== form.confirmPassword && (
+                  <p className="text-xs text-danger mt-1">兩次密碼不一致</p>
+                )}
               </div>
               <button
                 type="submit"
                 disabled={loading}
                 className="btn-primary w-full !py-3"
               >
-                {loading ? '註冊中…' : '免費註冊'}
+                {loading ? '註冊中…' : '免費註冊（送 20 點）'}
               </button>
             </form>
 
@@ -175,37 +230,9 @@ export default function RegisterPage() {
                 )}
                 {socialLoading === 'google' ? '正在連接 Google…' : '使用 Google 註冊'}
               </button>
-              <button
-                onClick={() => { setSocialLoading('facebook'); signIn('facebook', { callbackUrl: '/dashboard' }); }}
-                disabled={!!socialLoading}
-                className="w-full flex items-center justify-center gap-3 py-2.5 rounded-xl border border-white/[0.10] bg-white/[0.04] hover:bg-white/[0.08] disabled:opacity-50 text-sm font-medium text-ink-white transition-all"
-              >
-                {socialLoading === 'facebook' ? (
-                  <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                ) : (
-                  <svg className="w-5 h-5" viewBox="0 0 24 24"><path fill="#1877F2" d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
-                )}
-                {socialLoading === 'facebook' ? '正在連接 Facebook…' : '使用 Facebook 註冊'}
-              </button>
-              <button
-                onClick={() => { setSocialLoading('apple'); signIn('apple', { callbackUrl: '/dashboard' }); }}
-                disabled={!!socialLoading}
-                className="w-full flex items-center justify-center gap-3 py-2.5 rounded-xl border border-white/[0.10] bg-white/[0.04] hover:bg-white/[0.08] disabled:opacity-50 text-sm font-medium text-ink-white transition-all"
-              >
-                {socialLoading === 'apple' ? (
-                  <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                ) : (
-                  <svg className="w-5 h-5" viewBox="0 0 24 24"><path fill="currentColor" d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.09-.5-2.08-.48-3.24 0-1.44.62-2.2.44-3.06-.4C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.53 4.08zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/></svg>
-                )}
-                {socialLoading === 'apple' ? '正在連接 Apple…' : '使用 Apple 註冊'}
-              </button>
             </div>
 
-            <div className="mt-4 p-3 bg-electric-400/10 rounded-xl text-xs text-center text-electric-300">
-              🎉 註冊即送 20 點 · 生成失敗自動退款
-            </div>
-
-            <p className="text-center text-sm text-ink-gray mt-4">
+            <p className="text-center text-sm text-ink-gray mt-5">
               已有帳號？{' '}
               <Link href="/login" className="text-electric-300 font-medium hover:text-electric-200">
                 登入

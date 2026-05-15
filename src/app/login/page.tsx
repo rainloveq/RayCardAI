@@ -14,10 +14,15 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [socialLoading, setSocialLoading] = useState('');
+  const [attempts, setAttempts] = useState(0);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+
+    if (!email.trim()) { setError('請輸入電郵'); return; }
+    if (!password) { setError('請輸入密碼'); return; }
+
     setLoading(true);
 
     try {
@@ -28,7 +33,14 @@ export default function LoginPage() {
       });
 
       if (result?.error) {
-        setError('電郵或密碼錯誤');
+        const newAttempts = attempts + 1;
+        setAttempts(newAttempts);
+
+        if (newAttempts >= 5) {
+          setError('嘗試次數過多，請 15 分鐘後再試或使用 Google 登入');
+        } else {
+          setError(`電郵或密碼錯誤（剩餘 ${5 - newAttempts} 次嘗試）`);
+        }
         return;
       }
 
