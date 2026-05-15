@@ -868,9 +868,8 @@ export default function CreatePage() {
                             : 'border-brown-100 text-brown-400 hover:border-brown-200'
                         }`}
                       >
-                        <div className="text-base mb-1">{t.icon}</div>
-                        <div className="text-lg mb-0.5 tracking-wider">{t.preview}</div>
-                        <div className="font-medium">{t.label}</div>
+                        <div className="text-2xl mb-1">{t.icon}</div>
+                        <div className="font-medium text-xs">{t.label}</div>
                       </button>
                     ))}
                   </div>

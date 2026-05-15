@@ -369,18 +369,18 @@ export const TEXT_POSITIONS = [
 ];
 
 export const COLOR_TONES = [
-  { id: 'warm', label: '溫暖', icon: '☀️', desc: '暖金橙調，溫馨舒適', preview: '🟠🟡🟤' },
-  { id: 'cool', label: '冷色', icon: '❄️', desc: '藍紫冰調，清新優雅', preview: '🔵🟣🔷' },
-  { id: 'bright', label: '明亮', icon: '✨', desc: '鮮明亮麗，活力滿滿', preview: '🟡🟢🔴' },
-  { id: 'pastel', label: '柔和', icon: '🌸', desc: '粉彩夢幻，溫柔甜美', preview: '🩷🩵🩶' },
-  { id: 'golden', label: '金黃', icon: '🌟', desc: '奢華金光，高貴氣派', preview: '🟨🟧✨' },
-  { id: 'forest', label: '森林', icon: '🌿', desc: '自然綠意，清新療癒', preview: '🟢🌿🟩' },
-  { id: 'sunset', label: '夕陽', icon: '🌅', desc: '橙紅紫霞，浪漫迷人', preview: '🟧🟥🟪' },
-  { id: 'ocean', label: '海洋', icon: '🌊', desc: '藍綠清涼，自由奔放', preview: '🔵🟢🩵' },
-  { id: 'vintage', label: '復古', icon: '📷', desc: '懷舊暖棕，經典情懷', preview: '🟫🟨⬜' },
-  { id: 'neon', label: '霓虹', icon: '💜', desc: '螢光炫彩，潮流電音', preview: '🟪💗🟦' },
-  { id: 'monochrome', label: '黑白', icon: '🖤', desc: '經典黑白，極簡高雅', preview: '⬛⬜🩶' },
-  { id: 'candy', label: '糖果', icon: '🍬', desc: '繽紛甜美，少女心爆棚', preview: '🍬🍭🩷' },
+  { id: 'warm', label: '溫暖', icon: '🟠', desc: '暖金橙調，溫馨舒適' },
+  { id: 'cool', label: '冷色', icon: '🔵', desc: '藍紫冰調，清新優雅' },
+  { id: 'bright', label: '明亮', icon: '🟡', desc: '鮮明亮麗，活力滿滿' },
+  { id: 'pastel', label: '柔和', icon: '🩷', desc: '粉彩夢幻，溫柔甜美' },
+  { id: 'golden', label: '金黃', icon: '🟨', desc: '奢華金光，高貴氣派' },
+  { id: 'forest', label: '森林', icon: '🟢', desc: '自然綠意，清新療癒' },
+  { id: 'sunset', label: '夕陽', icon: '🟧', desc: '橙紅紫霞，浪漫迷人' },
+  { id: 'ocean', label: '海洋', icon: '🩵', desc: '藍綠清涼，自由奔放' },
+  { id: 'vintage', label: '復古', icon: '🟫', desc: '懷舊暖棕，經典情懷' },
+  { id: 'neon', label: '霓虹', icon: '🟪', desc: '螢光炫彩，潮流電音' },
+  { id: 'monochrome', label: '黑白', icon: '⬛', desc: '經典黑白，極簡高雅' },
+  { id: 'candy', label: '糖果', icon: '🍬', desc: '繽紛甜美，少女心爆棚' },
 ];
 
 export const GREETING_SUGGESTIONS = [
