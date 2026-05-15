@@ -128,6 +128,12 @@ export const CHARACTER_STYLES = [
     prompt: 'Keep the face identical. Transform this person into Spy x Family style — elegant spy suit or dress, clean anime art style, sophisticated urban background. Tatsuya Endo-inspired aesthetic, stylish and charming family vibe.',
   },
   {
+    id: 'hunter-x-hunter',
+    label: '全職獵人',
+    category: '卡通角色',
+    prompt: 'Keep the face identical. Transform this person into Hunter × Hunter style — green hunter jacket or battle outfit, Nen aura glowing around hands, Hunter Association badge, adventurous world background. Yoshihiro Togashi-inspired art style, determined and cool, with signature Hisoka/Killua/Gon vibe.',
+  },
+  {
     id: 'custom-character',
     label: '自訂造型 ✏️',
     category: '角色變身類',
