@@ -77,6 +77,7 @@ export default function CreatePage() {
   const [cardRatio, setCardRatio] = useState('3:4');
   const [textPosition, setTextPosition] = useState('bottom');
   const [colorTone, setColorTone] = useState('');
+  const [fastMode, setFastMode] = useState(false);
 
   // Result
   const [generatedCard, setGeneratedCard] = useState<any>(null);
@@ -207,6 +208,7 @@ export default function CreatePage() {
           cardRatio,
           textPosition,
           colorTone: colorTone || undefined,
+          resolution: fastMode ? '1K' : '2K',
         }),
       });
 
@@ -362,6 +364,7 @@ export default function CreatePage() {
     setCardRatio('3:4');
     setTextPosition('bottom');
     setColorTone('');
+    setFastMode(false);
     setGeneratedCard(null);
     currentCardIdRef.current = null;
   };
@@ -399,18 +402,54 @@ export default function CreatePage() {
           </div>
 
           {step === 'generating' && (
-            <div className="card-elevated text-center py-24 animate-fade-in max-w-lg mx-auto">
-              <div className="w-16 h-16 border-3 border-amber-400 border-t-transparent rounded-full animate-spin mx-auto mb-6" />
-              <p className="text-brown-600 font-medium text-lg">{progressMsg}</p>
-              <p className="text-brown-400 text-sm mt-3">生成約需 2–5 分鐘，請耐心等候，不要關閉頁面</p>
+            <div className="card-elevated text-center py-16 animate-fade-in max-w-lg mx-auto">
+              {/* Animated magic wand */}
+              <div className="relative mb-6 inline-block">
+                <div className="text-6xl animate-bounce">🪄</div>
+                <div className="absolute -top-2 -right-2 text-2xl animate-spin" style={{ animationDuration: '3s' }}>✨</div>
+                <div className="absolute -bottom-1 -left-2 text-xl animate-pulse">💫</div>
+              </div>
+
+              <p className="text-brown-600 font-serif font-bold text-xl mb-2">
+                AI 正在為你繪製賀卡
+              </p>
+              <p className="text-brown-400 text-sm mb-6">
+                {progressMsg}
+              </p>
+
+              {/* Progress bar */}
+              <div className="w-full bg-cream-200 rounded-full h-3 mb-3 overflow-hidden">
+                <div
+                  className="h-full bg-gradient-to-r from-amber-300 via-amber-400 to-amber-500 rounded-full transition-all duration-1000 ease-linear animate-pulse"
+                  style={{ width: `${Math.min(pollCount * 2.5, 90)}%` }}
+                />
+              </div>
+
+              {/* Animated waiting dots */}
+              <div className="flex items-center justify-center gap-1 mb-4">
+                {[0, 1, 2].map((i) => (
+                  <span
+                    key={i}
+                    className="w-2.5 h-2.5 bg-amber-400 rounded-full animate-bounce"
+                    style={{ animationDelay: `${i * 0.15}s` }}
+                  />
+                ))}
+              </div>
+
               {pollCount > 0 && (
-                <p className="text-brown-300 text-xs mt-2">
-                  已等待 {Math.floor(pollCount * 3)} 秒…
+                <p className="text-brown-400 text-sm font-medium">
+                  ⏱️ {Math.floor(pollCount * 3)} 秒
+                  {pollCount > 10 && pollCount <= 20 && ' · 還在努力中…'}
+                  {pollCount > 20 && pollCount <= 40 && ' · 快完成了，請稍候…'}
+                  {pollCount > 40 && ' · AI 仍在精心繪製…'}
                 </p>
               )}
-              <div className="mt-8 flex items-center justify-center gap-2 text-xs text-brown-300">
+
+              <div className="mt-6 flex items-center justify-center gap-2 text-xs text-brown-300">
                 <span className="w-2 h-2 bg-success rounded-full animate-pulse" />
-                <span>生成失敗自動退回點數</span>
+                <span>失敗自動退回點數</span>
+                <span className="mx-1">·</span>
+                <span>{fastMode ? '⚡ 快速模式' : '🎨 高品質模式'}</span>
               </div>
             </div>
           )}
@@ -444,9 +483,15 @@ export default function CreatePage() {
 
           {step === 'result' && generatedCard && (
             <div className="animate-fade-in max-w-lg mx-auto">
+              {/* Celebration header */}
               <div className="text-center mb-6">
-                <h2 className="text-xl font-serif font-bold text-brown-600">🎉 賀咭已準備好了！</h2>
-                <p className="text-brown-400 text-sm mt-1">你的個人化賀咭已準備好了</p>
+                <div className="text-5xl mb-3 animate-bounce">🎉</div>
+                <h2 className="text-2xl font-serif font-bold text-brown-600">
+                  賀卡生成完成！
+                </h2>
+                <p className="text-brown-400 text-sm mt-1">
+                  你的個人化賀卡已準備好
+                </p>
               </div>
 
               <div className="card-elevated mb-6 overflow-hidden rounded-xl">
@@ -881,15 +926,32 @@ export default function CreatePage() {
                     )}
                   </div>
 
+                  {/* Fast mode toggle */}
+                  <label className="flex items-center gap-3 mt-4 p-3 bg-cream-50 rounded-xl cursor-pointer hover:bg-cream-100 transition-colors">
+                    <div className={`relative w-10 h-6 rounded-full transition-colors ${fastMode ? 'bg-success' : 'bg-brown-200'}`}>
+                      <div className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${fastMode ? 'translate-x-[18px]' : 'translate-x-0.5'}`} />
+                    </div>
+                    <div className="flex-1">
+                      <span className="text-sm font-medium text-brown-600">⚡ 快速模式</span>
+                      <span className="text-xs text-brown-300 ml-2">較快完成 · 畫質略低</span>
+                    </div>
+                    <input
+                      type="checkbox"
+                      checked={fastMode}
+                      onChange={(e) => setFastMode(e.target.checked)}
+                      className="hidden"
+                    />
+                  </label>
+
                   <button
                     onClick={handleGenerate}
                     disabled={!imagePreview || !festival || !styleId || !greetingText}
-                    className="btn-primary w-full !py-3.5 mt-5 text-base"
+                    className="btn-primary w-full !py-3.5 mt-4 text-base"
                   >
                     ✨ 立即製作（消耗 {POINTS_PER_CARD} 點）
                   </button>
                   <p className="text-xs text-brown-300 text-center mt-2">
-                    生成約需 60–90 秒，生成失敗自動退款
+                    {fastMode ? '⚡ 快速模式約 60–90 秒' : '🎨 高品質約 2–3 分鐘'} · 失敗自動退款
                   </p>
 
                   {points < POINTS_PER_CARD && (

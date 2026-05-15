@@ -37,7 +37,7 @@ export async function POST(req: Request) {
     const {
       originalImageUrl, festival, styleId, styleType,
       decorations, greetingText, extraInstructions, customPrompt,
-      cardRatio, textPosition, colorTone,
+      cardRatio, textPosition, colorTone, resolution,
     } = body;
 
     // Validation
@@ -117,6 +117,7 @@ export async function POST(req: Request) {
         imageUrl: originalImageUrl,
         prompt,
         aspectRatio: cardRatio || '3:4',
+        resolution: resolution || '2K',
       });
     } catch {
       // KIE task creation failed — refund atomically

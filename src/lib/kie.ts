@@ -5,6 +5,7 @@ export async function createKIETask(params: {
   imageUrl: string;
   prompt: string;
   aspectRatio?: string;
+  resolution?: '1K' | '2K';
 }): Promise<string> {
   const KIE_API_KEY = process.env.KIE_API_KEY;
   if (!KIE_API_KEY) throw new Error('KIE_API_KEY not configured');
@@ -20,7 +21,7 @@ export async function createKIETask(params: {
       input: {
         prompt: params.prompt,
         aspect_ratio: params.aspectRatio || '3:4',
-        resolution: '2K',
+        resolution: params.resolution || '2K',
         output_format: 'jpg',
         image_input: [params.imageUrl],
       },
