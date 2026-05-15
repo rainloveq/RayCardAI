@@ -644,7 +644,6 @@ export default function CreatePage() {
                           }`}
                         >
                           <div className="font-medium">{s.label}</div>
-                          <div className="text-xs text-brown-300 mt-0.5">{s.category}</div>
                         </button>
                       )
                     )}
