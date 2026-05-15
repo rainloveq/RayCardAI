@@ -7,6 +7,7 @@ import Link from 'next/link';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import Toast, { useToast } from '@/components/Toast';
+import { removeBackground } from '@imgly/background-removal';
 import {
   CARD_TYPES, CHARACTER_STYLES, ILLUSTRATION_STYLES, BACKGROUND_STYLES,
   FESTIVAL_DECORATIONS, POINTS_PER_CARD,
@@ -79,9 +80,68 @@ export default function CreatePage() {
   const [textPosition, setTextPosition] = useState('bottom');
   const [colorTone, setColorTone] = useState('');
   const [fastMode, setFastMode] = useState(false);
+  const [cutoutBlobUrl, setCutoutBlobUrl] = useState<string | null>(null);
+  const [isRemovingBg, setIsRemovingBg] = useState(false);
+
+  // Remove background from uploaded image → transparent PNG of person only
+  const handleRemoveBackground = async () => {
+    if (!imageFile) return;
+    setIsRemovingBg(true);
+    showToast({ message: '正在移除背景…', type: 'info' });
+    try {
+      const blob = await removeBackground(imageFile);
+      const url = URL.createObjectURL(blob);
+      setCutoutBlobUrl(url);
+      showToast({ message: '背景已移除！人物保留原樣', type: 'success' });
+    } catch {
+      showToast({ message: '背景移除失敗，將使用原圖', type: 'error' });
+    }
+    setIsRemovingBg(false);
+  };
+
+  // Composite original person cutout onto AI-generated background
+  const compositePersonOnBackground = async (bgImageUrl: string): Promise<string> => {
+    if (!cutoutBlobUrl) return bgImageUrl; // no cutout, return as-is
+
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d')!;
+
+    // Load both images
+    const [bgImg, personImg] = await Promise.all([
+      new Promise<HTMLImageElement>((resolve, reject) => {
+        const img = new Image(); img.crossOrigin = 'anonymous';
+        img.onload = () => resolve(img); img.onerror = reject;
+        img.src = bgImageUrl;
+      }),
+      new Promise<HTMLImageElement>((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => resolve(img); img.onerror = reject;
+        img.src = cutoutBlobUrl;
+      }),
+    ]);
+
+    // Match canvas to background size
+    canvas.width = bgImg.width;
+    canvas.height = bgImg.height;
+
+    // Draw background first
+    ctx.drawImage(bgImg, 0, 0);
+
+    // Scale person to fit proportionally (~70% of canvas height, centered)
+    const personScale = (canvas.height * 0.75) / personImg.height;
+    const pw = personImg.width * personScale;
+    const ph = personImg.height * personScale;
+    const px = (canvas.width - pw) / 2;
+    const py = canvas.height * 0.05; // near top
+
+    ctx.drawImage(personImg, px, py, pw, ph);
+
+    return canvas.toDataURL('image/jpeg', 0.92);
+  };
 
   // Result
   const [generatedCard, setGeneratedCard] = useState<any>(null);
+  const [finalImageUrl, setFinalImageUrl] = useState<string | null>(null);
   const pollIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const pollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [pollCount, setPollCount] = useState(0);
@@ -251,7 +311,17 @@ export default function CreatePage() {
         if (card.status === 'completed') {
           stopPolling();
           setGeneratedCard(card);
-          setStep('result');
+          // Composite real person onto background if cutout available
+          if (cutoutBlobUrl && card.generatedImageUrl) {
+            setProgressMsg('正在合成真人照片…');
+            compositePersonOnBackground(card.generatedImageUrl).then((url) => {
+              setFinalImageUrl(url);
+              setStep('result');
+            });
+          } else {
+            setFinalImageUrl(card.generatedImageUrl);
+            setStep('result');
+          }
           showToast({ message: '賀咭生成成功！', type: 'success' });
           setPoints((prev) => Math.max(0, prev - POINTS_PER_CARD));
         } else if (card.status === 'failed') {
@@ -298,7 +368,16 @@ export default function CreatePage() {
       if (card.status === 'completed') {
         if (pollIntervalRef.current) clearInterval(pollIntervalRef.current);
         setGeneratedCard(card);
-        setStep('result');
+        // Composite real person if cutout available
+        if (cutoutBlobUrl && card.generatedImageUrl) {
+          compositePersonOnBackground(card.generatedImageUrl).then((url) => {
+            setFinalImageUrl(url);
+            setStep('result');
+          });
+        } else {
+          setFinalImageUrl(card.generatedImageUrl);
+          setStep('result');
+        }
         showToast({ message: '賀咭生成成功！', type: 'success' });
         setPoints((prev) => Math.max(0, prev - POINTS_PER_CARD));
       } else if (card.status === 'failed') {
@@ -335,9 +414,10 @@ export default function CreatePage() {
   };
 
   const handleDownload = async () => {
-    if (!generatedCard?.generatedImageUrl) return;
+    const downloadUrl = finalImageUrl || generatedCard?.generatedImageUrl;
+    if (!downloadUrl) return;
     try {
-      const res = await fetch(generatedCard.generatedImageUrl);
+      const res = await fetch(downloadUrl);
       const blob = await res.blob();
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -366,6 +446,8 @@ export default function CreatePage() {
     setTextPosition('bottom');
     setColorTone('');
     setFastMode(false);
+    setCutoutBlobUrl(null);
+    setFinalImageUrl(null);
     setGeneratedCard(null);
     currentCardIdRef.current = null;
   };
@@ -500,9 +582,9 @@ export default function CreatePage() {
                   className="bg-cosmos-800 relative"
                   style={{ aspectRatio: cardRatio.replace(':', '/') || '3/4' }}
                 >
-                  {generatedCard.generatedImageUrl ? (
+                  {finalImageUrl ? (
                     <img
-                      src={generatedCard.generatedImageUrl}
+                      src={finalImageUrl}
                       alt="生成的賀卡"
                       className="w-full h-full object-cover"
                     />
@@ -523,11 +605,12 @@ export default function CreatePage() {
                 </button>
                 <button
                   onClick={() => {
-                    if (navigator.share && generatedCard.generatedImageUrl) {
+                    const shareUrl = finalImageUrl || generatedCard?.generatedImageUrl;
+                    if (navigator.share && shareUrl) {
                       navigator.share({
                         title: 'RayCardAI 賀咭',
                         text: greetingText,
-                        url: generatedCard.generatedImageUrl,
+                        url: shareUrl,
                       }).catch(() => {});
                     }
                   }}
@@ -589,7 +672,31 @@ export default function CreatePage() {
                         >
                           ✕
                         </button>
-                        <p className="text-xs text-success mt-2 font-medium">✅ 已上傳</p>
+                        <p className="text-xs text-success mt-2 font-medium">
+                          {cutoutBlobUrl ? '✅ 已上傳 + 背景已移除' : '✅ 已上傳'}
+                        </p>
+                        {!cutoutBlobUrl && (
+                          <button
+                            type="button"
+                            onClick={(e) => { e.stopPropagation(); handleRemoveBackground(); }}
+                            disabled={isRemovingBg}
+                            className="mt-2 px-3 py-1.5 rounded-lg border border-electric-400/40 text-electric-300 text-xs hover:bg-electric-400/10 disabled:opacity-50 transition-all"
+                          >
+                            {isRemovingBg ? '🔄 移除背景中…' : '✂️ 移除背景（保留真人）'}
+                          </button>
+                        )}
+                        {cutoutBlobUrl && (
+                          <div className="mt-2 flex items-center gap-2">
+                            <img src={cutoutBlobUrl} alt="去背預覽" className="w-16 h-16 object-contain rounded-lg bg-cosmos-800" />
+                            <button
+                              type="button"
+                              onClick={(e) => { e.stopPropagation(); setCutoutBlobUrl(null); }}
+                              className="text-xs text-ink-dim hover:text-danger"
+                            >
+                              取消去背
+                            </button>
+                          </div>
+                        )}
                       </div>
                     ) : (
                       <>
