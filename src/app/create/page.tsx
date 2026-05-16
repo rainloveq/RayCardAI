@@ -26,6 +26,8 @@ import {
   CARD_RATIOS, TEXT_POSITIONS, COLOR_TONES,
   GREETING_SUGGESTIONS,
 } from '@/lib/constants';
+import { generateShareImage } from '@/lib/shareFrame';
+import { createParticleSystem, getEffectForFestival, EFFECT_LABELS, EffectType } from '@/lib/animation';
 
 /** Compress image to max dimension 800px, returns a smaller File/Blob */
 async function compressImage(file: File, maxDim = 800, quality = 0.8): Promise<File> {
@@ -96,6 +98,13 @@ export default function CreatePage() {
   const [isRemovingBg, setIsRemovingBg] = useState(false);
   const [isPublished, setIsPublished] = useState(false);
   const [publishing, setPublishing] = useState(false);
+  const [sharing, setSharing] = useState(false);
+  const [showAnimation, setShowAnimation] = useState(false);
+  const [animationEffect, setAnimationEffect] = useState<EffectType>('sparkle');
+  const [animating, setAnimating] = useState(false);
+  const [exportingGIF, setExportingGIF] = useState(false);
+  const animationCanvasRef = useRef<HTMLCanvasElement | null>(null);
+  const particleSystemRef = useRef<ReturnType<typeof createParticleSystem> | null>(null);
 
   // Remove background from uploaded image → transparent PNG of person only
   const handleRemoveBackground = async () => {
@@ -447,6 +456,74 @@ export default function CreatePage() {
     }
   };
 
+  const handleShare = async () => {
+    const url = finalImageUrl || generatedCard?.generatedImageUrl;
+    if (!url) return;
+    setSharing(true);
+    try {
+      const festivalId = CARD_TYPES.find((c) => c.label === generatedCard?.festival)?.id || 'other';
+      const blob = await generateShareImage(url, festivalId, greetingText);
+      const downloadUrl = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = downloadUrl;
+      a.download = `raycardai-share-${Date.now()}.png`;
+      a.click();
+      URL.revokeObjectURL(downloadUrl);
+      showToast({ message: '分享圖已下載！', type: 'success' });
+    } catch {
+      showToast({ message: '分享圖生成失敗', type: 'error' });
+    }
+    setSharing(false);
+  };
+
+  const handleOpenAnimation = () => {
+    const festivalId = CARD_TYPES.find((c) => c.label === generatedCard?.festival)?.id || 'other';
+    setAnimationEffect(getEffectForFestival(festivalId));
+    setShowAnimation(true);
+  };
+
+  const handleStartAnimation = () => {
+    if (!animationCanvasRef.current) return;
+    const url = finalImageUrl || generatedCard?.generatedImageUrl;
+    if (!url) return;
+    particleSystemRef.current?.stop();
+    const system = createParticleSystem(animationCanvasRef.current, url, animationEffect, 3);
+    particleSystemRef.current = system;
+    system.start();
+    setAnimating(true);
+  };
+
+  const handleExportGIF = async () => {
+    if (!animationCanvasRef.current) return;
+    const url = finalImageUrl || generatedCard?.generatedImageUrl;
+    if (!url) return;
+    setExportingGIF(true);
+    try {
+      // Use Canvas captureStream + MediaRecorder for WebM export
+      const canvas = animationCanvasRef.current;
+      const stream = canvas.captureStream(15);
+      const chunks: Blob[] = [];
+      const recorder = new MediaRecorder(stream, { mimeType: 'video/webm' });
+      recorder.ondataavailable = (e) => { if (e.data.size > 0) chunks.push(e.data); };
+      recorder.onstop = () => {
+        const blob = new Blob(chunks, { type: 'video/webm' });
+        const downloadUrl = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = downloadUrl;
+        a.download = `raycardai-animated-${Date.now()}.webm`;
+        a.click();
+        URL.revokeObjectURL(downloadUrl);
+        showToast({ message: '動態賀卡已下載！', type: 'success' });
+      };
+      recorder.start();
+      handleStartAnimation();
+      setTimeout(() => { recorder.stop(); }, 3500);
+    } catch {
+      showToast({ message: '導出失敗', type: 'error' });
+    }
+    setExportingGIF(false);
+  };
+
   const handleTogglePublish = async () => {
     if (!generatedCard?.id) return;
     setPublishing(true);
@@ -482,6 +559,7 @@ export default function CreatePage() {
     setFinalImageUrl(null);
     setGeneratedCard(null);
     setIsPublished(false);
+    setShowAnimation(false);
     currentCardIdRef.current = null;
   };
 
@@ -655,6 +733,12 @@ export default function CreatePage() {
                 >
                   📤 分享
                 </button>
+                <button onClick={handleShare} disabled={sharing} className="btn-secondary">
+                  {sharing ? '生成中…' : '📤 分享圖'}
+                </button>
+                <button onClick={handleOpenAnimation} className="btn-secondary">
+                  🎬 動態版
+                </button>
                 <button onClick={handleTogglePublish} disabled={publishing} className="btn-secondary">
                   {isPublished ? '🔒 取消公開' : '🌐 設為公開'}
                 </button>
@@ -663,6 +747,53 @@ export default function CreatePage() {
               <p className="text-xs text-ink-dim text-center mt-4">
                 長按圖片 → 「加入相片」儲存至相簿
               </p>
+
+              {showAnimation && (
+                <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4 backdrop-blur-sm">
+                  <div className="bg-surface-card rounded-xl max-w-lg w-full p-5 animate-fade-in shadow-elevated">
+                    <h3 className="font-serif font-bold text-lg text-ink-white mb-3">🎬 動態賀卡</h3>
+
+                    {/* Effect selector */}
+                    <div className="flex flex-wrap gap-1.5 mb-4">
+                      {(Object.keys(EFFECT_LABELS) as EffectType[]).map((e) => (
+                        <button
+                          key={e}
+                          onClick={() => { setAnimationEffect(e); setAnimating(false); }}
+                          className={`px-3 py-1.5 rounded-lg text-xs border transition-all ${
+                            animationEffect === e
+                              ? 'border-electric-400 bg-electric-400/10 text-electric-300'
+                              : 'border-white/[0.10] text-ink-dim hover:border-white/[0.20]'
+                          }`}
+                        >
+                          {EFFECT_LABELS[e]}
+                        </button>
+                      ))}
+                    </div>
+
+                    {/* Preview canvas */}
+                    <div className="aspect-[3/4] bg-cosmos-800 rounded-lg overflow-hidden mb-4">
+                      <canvas
+                        ref={animationCanvasRef}
+                        width={360}
+                        height={480}
+                        className="w-full h-full object-contain"
+                      />
+                    </div>
+
+                    <div className="flex gap-2">
+                      <button onClick={handleStartAnimation} className="btn-primary flex-1">
+                        {animating ? '🔄 重新播放' : '▶️ 預覽'}
+                      </button>
+                      <button onClick={handleExportGIF} disabled={exportingGIF} className="btn-secondary flex-1">
+                        {exportingGIF ? '導出中…' : '📥 下載動態版'}
+                      </button>
+                      <button onClick={() => { setShowAnimation(false); particleSystemRef.current?.stop(); }} className="btn-secondary">
+                        關閉
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
