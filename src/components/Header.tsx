@@ -39,6 +39,12 @@ export default function Header() {
                 主頁
               </Link>
               <Link
+                href="/gallery"
+                className="btn-ghost text-sm hidden sm:inline-flex"
+              >
+                探索
+              </Link>
+              <Link
                 href="/history"
                 className="btn-ghost text-sm hidden sm:inline-flex"
               >

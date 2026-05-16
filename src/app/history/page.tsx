@@ -15,6 +15,8 @@ export default function HistoryPage() {
   const [cards, setCards] = useState<Card[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedCard, setSelectedCard] = useState<Card | null>(null);
+  const [publishing, setPublishing] = useState(false);
+  const [cardPublishState, setCardPublishState] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     if (status === 'unauthenticated') router.push('/login');
@@ -59,6 +61,20 @@ export default function HistoryPage() {
     } catch {
       window.open(card.generatedImageUrl, '_blank');
     }
+  };
+
+  const handleTogglePublish = async (cardId: string, e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
+    setPublishing(true);
+    const isPub = cardPublishState[cardId] || false;
+    const endpoint = isPub ? 'unpublish' : 'publish';
+    try {
+      const res = await fetch(`/api/cards/${cardId}/${endpoint}`, { method: 'POST' });
+      if (res.ok) {
+        setCardPublishState((prev) => ({ ...prev, [cardId]: !isPub }));
+      }
+    } catch {}
+    setPublishing(false);
   };
 
   if (status === 'loading') {
@@ -137,6 +153,13 @@ export default function HistoryPage() {
                         className="btn-secondary flex-1 text-danger"
                       >
                         🗑️ 刪除
+                      </button>
+                      <button
+                        onClick={(e) => handleTogglePublish(selectedCard.id, e)}
+                        disabled={publishing}
+                        className="btn-secondary"
+                      >
+                        {cardPublishState[selectedCard.id] ? '🔒 取消公開' : '🌐 設為公開'}
                       </button>
                       <button
                         onClick={() => setSelectedCard(null)}

@@ -94,6 +94,8 @@ export default function CreatePage() {
   const [fastMode, setFastMode] = useState(false);
   const [cutoutBlobUrl, setCutoutBlobUrl] = useState<string | null>(null);
   const [isRemovingBg, setIsRemovingBg] = useState(false);
+  const [isPublished, setIsPublished] = useState(false);
+  const [publishing, setPublishing] = useState(false);
 
   // Remove background from uploaded image → transparent PNG of person only
   const handleRemoveBackground = async () => {
@@ -445,6 +447,21 @@ export default function CreatePage() {
     }
   };
 
+  const handleTogglePublish = async () => {
+    if (!generatedCard?.id) return;
+    setPublishing(true);
+    const endpoint = isPublished ? 'unpublish' : 'publish';
+    try {
+      const res = await fetch(`/api/cards/${generatedCard.id}/${endpoint}`, { method: 'POST' });
+      const { ok, data } = await safeJson(res);
+      if (ok && data.success) {
+        setIsPublished(!isPublished);
+        showToast({ message: isPublished ? '已取消公開' : '已設為公開！', type: 'success' });
+      }
+    } catch {}
+    setPublishing(false);
+  };
+
   const resetForm = () => {
     setStep('form');
     setImageFile(null);
@@ -464,6 +481,7 @@ export default function CreatePage() {
     setCutoutBlobUrl(null);
     setFinalImageUrl(null);
     setGeneratedCard(null);
+    setIsPublished(false);
     currentCardIdRef.current = null;
   };
 
@@ -636,6 +654,9 @@ export default function CreatePage() {
                   className="btn-secondary"
                 >
                   📤 分享
+                </button>
+                <button onClick={handleTogglePublish} disabled={publishing} className="btn-secondary">
+                  {isPublished ? '🔒 取消公開' : '🌐 設為公開'}
                 </button>
               </div>
 
