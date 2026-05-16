@@ -144,6 +144,10 @@
   0%, 100% { box-shadow: 0 0 20px rgba(59,130,246,0.1); }
   50%      { box-shadow: 0 0 40px rgba(59,130,246,0.25), 0 0 80px rgba(124,58,237,0.1); }
 }
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
 
 /* ─── Toast ─── */
 .toast-enter {

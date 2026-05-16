@@ -7,7 +7,19 @@ import Link from 'next/link';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import Toast, { useToast } from '@/components/Toast';
-import { removeBackground } from '@imgly/background-removal';
+// Lazy-loaded background removal (may fail on some devices)
+let removeBackgroundFn: any = null;
+async function getRemoveBackground() {
+  if (removeBackgroundFn) return removeBackgroundFn;
+  try {
+    const mod = await import('@imgly/background-removal');
+    removeBackgroundFn = mod.removeBackground;
+    return removeBackgroundFn;
+  } catch {
+    return null;
+  }
+}
+
 import {
   CARD_TYPES, CHARACTER_STYLES, ILLUSTRATION_STYLES, BACKGROUND_STYLES,
   FESTIVAL_DECORATIONS, POINTS_PER_CARD,
@@ -87,14 +99,17 @@ export default function CreatePage() {
   const handleRemoveBackground = async () => {
     if (!imageFile) return;
     setIsRemovingBg(true);
-    showToast({ message: '正在移除背景…', type: 'info' });
+    showToast({ message: '正在載入 AI 去背模型…', type: 'info' });
     try {
-      const blob = await removeBackground(imageFile);
+      const removeBg = await getRemoveBackground();
+      if (!removeBg) throw new Error('模型載入失敗');
+      showToast({ message: '正在移除背景…', type: 'info' });
+      const blob = await removeBg(imageFile);
       const url = URL.createObjectURL(blob);
       setCutoutBlobUrl(url);
       showToast({ message: '背景已移除！人物保留原樣', type: 'success' });
     } catch {
-      showToast({ message: '背景移除失敗，將使用原圖', type: 'error' });
+      showToast({ message: '背景移除失敗（可能不支援此裝置），將使用原圖', type: 'error' });
     }
     setIsRemovingBg(false);
   };
@@ -500,20 +515,23 @@ export default function CreatePage() {
                 {progressMsg}
               </p>
 
-              {/* Progress bar */}
-              <div className="w-full bg-cosmos-700 rounded-full h-3 mb-3 overflow-hidden">
+              {/* Indeterminate progress bar */}
+              <div className="w-full bg-cosmos-700 rounded-full h-2 mb-3 overflow-hidden">
                 <div
-                  className="h-full bg-gradient-to-r from-amber-300 via-amber-400 to-amber-500 rounded-full transition-all duration-1000 ease-linear animate-pulse"
-                  style={{ width: `${Math.min(pollCount * 2.5, 90)}%` }}
+                  className="h-full w-1/3 bg-gradient-to-r from-electric-500 via-plasma-500 to-electric-500 rounded-full animate-shimmer"
+                  style={{
+                    backgroundSize: '200% 100%',
+                    animation: 'shimmer 2s ease-in-out infinite',
+                  }}
                 />
               </div>
 
-              {/* Animated waiting dots */}
-              <div className="flex items-center justify-center gap-1 mb-4">
+              {/* Waiting dots */}
+              <div className="flex items-center justify-center gap-1.5 mb-4">
                 {[0, 1, 2].map((i) => (
                   <span
                     key={i}
-                    className="w-2.5 h-2.5 bg-electric-500 rounded-full animate-bounce"
+                    className="w-2 h-2 bg-electric-400 rounded-full animate-bounce"
                     style={{ animationDelay: `${i * 0.15}s` }}
                   />
                 ))}
@@ -522,9 +540,10 @@ export default function CreatePage() {
               {pollCount > 0 && (
                 <p className="text-ink-gray text-sm font-medium">
                   ⏱️ {Math.floor(pollCount * 3)} 秒
-                  {pollCount > 10 && pollCount <= 20 && ' · 還在努力中…'}
-                  {pollCount > 20 && pollCount <= 40 && ' · 快完成了，請稍候…'}
-                  {pollCount > 40 && ' · AI 仍在精心繪製…'}
+                  {pollCount <= 10 && ' · 正在構思場景…'}
+                  {pollCount > 10 && pollCount <= 25 && ' · AI 繪製背景中…'}
+                  {pollCount > 25 && pollCount <= 50 && ' · 加入裝飾元素…'}
+                  {pollCount > 50 && ' · 最後修飾中…'}
                 </p>
               )}
 
