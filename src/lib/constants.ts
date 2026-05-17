@@ -234,7 +234,7 @@ export const ILLUSTRATION_STYLES = [
   {
     id: 'chibi',
     label: 'Q版公仔',
-    prompt: 'Transform the ENTIRE image into chibi style — big head, small body, soft colors, cute clean design. Preserve the person faithfully as a chibi character.',
+    prompt: 'Transform the ENTIRE image into chibi figurine style — EXTREMELY large head (50% of body height), tiny cute body (stick-figure proportions), huge sparkling eyes occupying half the face, tiny nose and mouth, round chubby cheeks. Soft pastel colors, adorable toy-like finish, cute clean design. Preserve the person faithfully as an adorable chibi character.',
   },
   {
     id: 'sketch',

@@ -274,7 +274,6 @@ export function createParticleSystem(
 
     if (!image) {
       const img = new Image();
-      img.crossOrigin = 'anonymous';
       img.onload = () => {
         image = img;
         animationId = requestAnimationFrame(animate);
