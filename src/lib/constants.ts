@@ -119,6 +119,11 @@ export const BACKGROUND_STYLES = [
     prompt: 'Virtual idol stage background — glowing concert stage, neon lights, colorful spotlights, futuristic J-pop vibe.',
   },
   {
+    id: 'chibi',
+    label: 'Q版大頭',
+    prompt: 'Chibi toy world background — oversized colorful toy blocks, giant candy and lollipops, cute pastel playroom setting, tiny dollhouse furniture. Everything around the person is adorably oversized to make them look like a cute figurine in a toy world.',
+  },
+  {
     id: 'custom-background',
     label: '自訂背景 ✏️',
     prompt: 'Custom background: ',
@@ -230,11 +235,6 @@ export const ILLUSTRATION_STYLES = [
     id: '3d-cartoon',
     label: '3D卡通',
     prompt: 'Transform the ENTIRE image into 3D Pixar-style cartoon — soft rounded features, toy-like appearance. Preserve the person faithfully in 3D cartoon style.',
-  },
-  {
-    id: 'chibi',
-    label: 'Q版公仔',
-    prompt: 'Transform the ENTIRE image into chibi figurine style — EXTREMELY large head (50% of body height), tiny cute body (stick-figure proportions), huge sparkling eyes occupying half the face, tiny nose and mouth, round chubby cheeks. Soft pastel colors, adorable toy-like finish, cute clean design. Preserve the person faithfully as an adorable chibi character.',
   },
   {
     id: 'sketch',
