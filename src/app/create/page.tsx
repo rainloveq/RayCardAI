@@ -110,17 +110,30 @@ export default function CreatePage() {
   const handleRemoveBackground = async () => {
     if (!imageFile) return;
     setIsRemovingBg(true);
-    showToast({ message: '正在載入 AI 去背模型…', type: 'info' });
+    showToast({ message: '正在下載 AI 模型（首次約需 30 秒）…', type: 'info' });
     try {
       const removeBg = await getRemoveBackground();
       if (!removeBg) throw new Error('模型載入失敗');
       showToast({ message: '正在移除背景…', type: 'info' });
-      const blob = await removeBg(imageFile);
+      const blob = await removeBg(imageFile, {
+        model: 'medium',
+        output: { format: 'image/png' },
+        progress: (key: string, current: number, total: number) => {
+          if (key === 'compute:inference' && current > 0) {
+            showToast({ message: `正在處理… ${Math.round((current / total) * 100)}%`, type: 'info' });
+          }
+        },
+      });
       const url = URL.createObjectURL(blob);
       setCutoutBlobUrl(url);
       showToast({ message: '背景已移除！人物保留原樣', type: 'success' });
-    } catch {
-      showToast({ message: '背景移除失敗（可能不支援此裝置），將使用原圖', type: 'error' });
+    } catch (err: any) {
+      const msg = err?.message || '';
+      if (msg.includes('SharedArrayBuffer') || msg.includes('crossOrigin')) {
+        showToast({ message: '此瀏覽器不支援 AI 去背，建議用桌面版 Chrome', type: 'error' });
+      } else {
+        showToast({ message: '背景移除失敗，將使用原圖', type: 'error' });
+      }
     }
     setIsRemovingBg(false);
   };
