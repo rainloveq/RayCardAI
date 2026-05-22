@@ -14,18 +14,21 @@ interface GalleryItem {
 }
 
 export default function HomePage() {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const [galleryCards, setGalleryCards] = useState<GalleryItem[]>([]);
   const [visibleCards, setVisibleCards] = useState<number[]>([]);
   const cardsRef = useRef<HTMLDivElement>(null);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => { setMounted(true); }, []);
 
   useEffect(() => {
-    // Fetch public gallery cards for preview
+    if (!mounted) return;
     fetch('/api/gallery?page=1&limit=8')
       .then((r) => r.json())
       .then((d) => setGalleryCards(d.cards || []))
       .catch(() => {});
-  }, []);
+  }, [mounted]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -44,7 +47,16 @@ export default function HomePage() {
     return () => observer.disconnect();
   }, []);
 
-  const isLoggedIn = !!session?.user;
+  const isLoggedIn = !!(session?.user);
+  const showUI = mounted; // prevent hydration mismatch
+
+  if (!showUI) {
+    return (
+      <div className="min-h-screen bg-cosmos-950 flex items-center justify-center">
+        <div className="animate-spin w-8 h-8 border-2 border-electric-400 border-t-transparent rounded-full" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-cosmos-950">
