@@ -28,27 +28,31 @@ export default function AdminPage() {
   const [selectedCard, setSelectedCard] = useState<any>(null);
 
   const fetchJson = async (url: string) => {
-    const res = await fetch(url);
-    if (res.status === 401) { setAuthenticated(false); return null; }
-    return res.json();
+    try {
+      const res = await fetch(url);
+      if (res.status === 401) { setAuthenticated(false); return null; }
+      return await res.json();
+    } catch { return null; }
   };
 
   const handleLogin = async () => {
     setLoginError('');
-    const res = await fetch('/api/admin/login', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ password }),
-    });
-    if (res.ok) { setAuthenticated(true); setPassword(''); }
-    else { const d = await res.json(); setLoginError(d.error || '登入失敗'); }
+    try {
+      const res = await fetch('/api/admin/login', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password }),
+      });
+      if (res.ok) { setAuthenticated(true); setPassword(''); }
+      else { const d = await res.json().catch(() => ({})); setLoginError(d.error || '登入失敗'); }
+    } catch { setLoginError('網絡錯誤'); }
   };
 
   const loadStats = async () => { setLoading(true); const d = await fetchJson('/api/admin/stats'); if (d) setStats(d); setLoading(false); };
-  const loadUsers = async (search = '') => { const d = await fetchJson(`/api/admin/users?search=${search}`); if (d) setUsers(d.users); };
-  const loadOrders = async (status = '') => { const d = await fetchJson(`/api/admin/orders?status=${status}`); if (d) setOrders(d.orders); };
-  const loadCards = async (userId = '') => { const d = await fetchJson(`/api/admin/cards?userId=${userId}`); if (d) setCards(d.cards); };
+  const loadUsers = async (search = '') => { const d = await fetchJson(`/api/admin/users?search=${search}`); if (d) setUsers(d.users || []); };
+  const loadOrders = async (status = '') => { const d = await fetchJson(`/api/admin/orders?status=${status}`); if (d) setOrders(d.orders || []); };
+  const loadCards = async (userId = '') => { const d = await fetchJson(`/api/admin/cards?userId=${userId}`); if (d) setCards(d.cards || []); };
 
-  useEffect(() => { if (authenticated) { loadStats(); loadUsers(); loadOrders(); loadCards(); } }, [authenticated]);
+  useEffect(() => { if (authenticated) { loadStats(); loadUsers(''); loadOrders(''); loadCards(''); } }, [authenticated]);
 
   const handlePoints = async () => {
     if (!pointsModal) return;
