@@ -253,10 +253,10 @@ export default function CreatePage() {
   }, []);
 
   const handleGenerate = async () => {
-    if (!imagePreview || !festival || !styleId || !greetingText) {
-      showToast({ message: '請填寫所有必填欄位', type: 'error' });
-      return;
-    }
+    if (!imagePreview) { showToast({ message: '請先上傳照片', type: 'error' }); return; }
+    if (!festival) { showToast({ message: '請選擇節日 / 重要時刻', type: 'error' }); return; }
+    if (!styleId) { showToast({ message: '請選擇一個風格（背景主題 / 全卡通角色 / 藝術畫風）', type: 'error' }); return; }
+    if (!greetingText.trim()) { showToast({ message: '請輸入祝福語', type: 'error' }); return; }
 
     // Validate custom style has description
     if (styleId.startsWith('custom-') && !customStyleDesc.trim()) {
