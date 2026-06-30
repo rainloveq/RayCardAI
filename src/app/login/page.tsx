@@ -33,6 +33,14 @@ export default function LoginPage() {
       });
 
       if (result?.error) {
+        // Check if this is an OAuth-only account
+        const checkRes = await fetch(`/api/auth/check-email?email=${encodeURIComponent(email)}`);
+        const checkData = await checkRes.json().catch(() => ({}));
+        if (checkData.oauthOnly) {
+          setError('此電郵使用 Google 登入註冊，請點擊下方「使用 Google 登入」按鈕');
+          return;
+        }
+
         const newAttempts = attempts + 1;
         setAttempts(newAttempts);
 
