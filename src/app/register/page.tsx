@@ -219,7 +219,7 @@ export default function RegisterPage() {
             {/* Social login */}
             <div className="space-y-2.5">
               <button
-                onClick={() => { setSocialLoading('google'); signIn('google', { callbackUrl: '/dashboard' }); }}
+                onClick={async () => { setSocialLoading('google'); try { await signIn('google', { callbackUrl: '/dashboard' }); } catch {} setSocialLoading(''); }}
                 disabled={!!socialLoading}
                 className="w-full flex items-center justify-center gap-3 py-2.5 rounded-xl border border-white/[0.10] bg-white/[0.04] hover:bg-white/[0.08] disabled:opacity-50 text-sm font-medium text-ink-white transition-all"
               >
